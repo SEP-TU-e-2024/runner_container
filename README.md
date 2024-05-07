@@ -1,2 +1,2 @@
-# python_pid_profiler
-Simple CPU time tracker for a certain process with profiling capabilities
+# Runner Container
+Bare-bones Docker container that takes an executable and an evaluation library and outputs a full array of metrics, including execution time and quality of results
