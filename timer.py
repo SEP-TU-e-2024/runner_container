@@ -18,7 +18,7 @@ def main():
         return
 
     if len(sys.argv) < 3:
-        print("Usage: python timer.py time_limit executable <arguments of executable>")
+        print("Usage: python3 timer.py time_limit executable <arguments of executable>")
         return
 
     time_limit = float(sys.argv[1]) # time limit in seconda
