@@ -1,15 +1,9 @@
 FROM debian
 
 # install basic dependencies at creation time
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install -y python3
-RUN apt-get install -y python3-pip
-RUN apt-get install -y python3-venv
-RUN apt-get install -y python3-psutil
-RUN apt-get install -y time
-# RUN apt-get install -y python3-time
+RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv python3-psutil time
 
+# create a user to run execute the code without privileges
 RUN useradd user
 
 WORKDIR /
