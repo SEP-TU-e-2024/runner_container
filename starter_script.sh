@@ -5,4 +5,4 @@ source env/bin/activate
 # python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 deactivate
-python3 /scripts/timer.py 100 sleep 2
+time /usr/bin/time -f "%e,%S,%U" -o /metrics/time.txt python3 main.py
