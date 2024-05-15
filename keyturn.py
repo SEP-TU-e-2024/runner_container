@@ -9,7 +9,7 @@ docker_client = docker.from_env()
 imagefile = "runner_container"
 code_path = "/repository"
 
-metrics_path = "/metrics"
+metrics_path = "~/metrics"
 
 
 def generate_string(len):
