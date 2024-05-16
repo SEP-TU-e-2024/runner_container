@@ -1,22 +1,11 @@
-FROM debian
+FROM python:3
 
-# install basic dependencies at creation time
-RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv time
-#python3-psutil 
+COPY target.zip /
+RUN unzip target.zip
 
-# create a user to run execute the code without privileges - no longer needed
-# RUN useradd user
+WORKDIR /target
 
-WORKDIR /
+RUN pip install --upgrade setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
-# add the starter scripts to the container
-COPY starter_script.sh /scripts/starter_script.sh
-# COPY timer.py /scripts/timer.py - no longer needed
-
-# make the bash script executable
-RUN chmod +x /scripts/starter_script.sh
-
-# WORKDIR /runtime
-
-# run the script - main command
-CMD ["/scripts/starter_script.sh"]
+CMD ["/bin/sh", "-c", "python", "main.py", ">>", "stdout.txt"]
