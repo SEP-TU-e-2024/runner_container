@@ -8,3 +8,8 @@ The log shows the total and CPU time of the program.
 
 ## Progress
 MVP requirements are achieved and the container runs without any issues. All implemented features seem to work.
+
+# Some options:
+Using container.logs(stream=True), this returns a blocking stream object where you can process output as they happen
+
+Using named pipes: make pipes somewhere on your system (example: /tmp/pipe) and then mount these pipes to your docker container
