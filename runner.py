@@ -4,6 +4,7 @@ import os
 import docker
 from docker.types import Mount
 import subprocess
+import time
 
 PIPE_STDOUT = '/tmp/test'
 
@@ -12,26 +13,23 @@ class Runner():
         self.docker_client = docker.from_env()
         self.docker_image, _ = self.docker_client.images.build(path=DOCKER_FILE_PARRENT_DIR)
 
-        #self._setup_pipes()
+        self._setup_pipes()
 
     def _setup_pipes(self):
         if not os.path.exists(PIPE_STDOUT):
             os.mkfifo(PIPE_STDOUT)
 
     def run(self):
-        #mount = Mount(target='/target/test', source=PIPE_STDOUT, type='npipe')
-        #container = self.docker_client.containers.run(image=self.docker_image, mounts=[mount], detach=True)
-        container = self.docker_client.containers.run(image=self.docker_image, detach=True)
+        mount = Mount(target='/tmp/test', source=PIPE_STDOUT, type='bind')
+        container = self.docker_client.containers.run(image=self.docker_image, mounts=[mount], detach=True)
 
-        #print("container done")
-        #subprocess.Popen("echo bruh > /tmp/test", shell=True)
+        subprocess.Popen("echo boiler > /tmp/test", shell=True)
         #subprocess.Popen("cat /tmp/test", shell=True)
-        #print("subprocess run")
 
-        #print(container.logs().decode())
-        for r in container.logs(stream=True):
-            print(r)
-        
+        print('waiting')
+        time.sleep(2)
+
+        print(container.logs().decode())
 
 #----------------------------------------------------------------
 # TESTING
