@@ -23,10 +23,12 @@ class Runner():
         mount = Mount(target='/tmp/test', source=PIPE_STDOUT, type='bind')
         container = self.docker_client.containers.run(image=self.docker_image, mounts=[mount], detach=True)
 
-        subprocess.Popen("python3 validator.py > /tmp/test", shell=True)
+        validator = subprocess.Popen("python3 validator.py > /tmp/test", stdin=subprocess.PIPE, shell=True)
 
         for data  in container.logs(stream=True):
-            print(data)
+            print(f"runner: {data.decode()}")
+            if validator.poll() == None:
+                validator.communicate(input=data)
 
 #----------------------------------------------------------------
 # TESTING
