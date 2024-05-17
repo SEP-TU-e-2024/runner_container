@@ -1,3 +1,8 @@
+import time
+
 print("test")
-temp = input()
-print(temp)
+
+
+for i in range(5):
+    temp = input()
+    print(f"{temp}-{i}")

@@ -25,10 +25,11 @@ class Runner():
 
         validator = subprocess.Popen("python3 validator.py > /tmp/test", stdin=subprocess.PIPE, shell=True)
 
-        for data  in container.logs(stream=True):
+        for data in container.logs(stream=True):
             print(f"runner: {data.decode()}")
             if validator.poll() == None:
-                validator.communicate(input=data)
+                validator.stdin.write(data)
+                validator.stdin.flush()
 
 #----------------------------------------------------------------
 # TESTING
