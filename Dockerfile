@@ -8,4 +8,4 @@ WORKDIR /target
 RUN pip install --upgrade setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD /bin/sh -c "python main.py < /tmp/test"
+CMD /bin/sh -c "python main.py < /tmp/stdin"

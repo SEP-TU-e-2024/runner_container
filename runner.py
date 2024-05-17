@@ -6,7 +6,7 @@ from docker.types import Mount
 import subprocess
 import time
 
-PIPE_STDOUT = '/tmp/test'
+PIPE_STDIN = '/tmp/stdin'
 
 class Runner():
     def __init__(self):
@@ -16,14 +16,16 @@ class Runner():
         self._setup_pipes()
 
     def _setup_pipes(self):
-        if not os.path.exists(PIPE_STDOUT):
-            os.mkfifo(PIPE_STDOUT)
+        if not os.path.exists(PIPE_STDIN):
+            os.mkfifo(PIPE_STDIN)
 
     def run(self):
-        mount = Mount(target='/tmp/test', source=PIPE_STDOUT, type='bind')
+        mount = Mount(target=PIPE_STDIN, source=PIPE_STDIN, type='bind')
         container = self.docker_client.containers.run(image=self.docker_image, mounts=[mount], detach=True)
 
-        validator = subprocess.Popen("python3 validator.py > /tmp/test", stdin=subprocess.PIPE, shell=True)
+        validator = subprocess.Popen(f"python3 validator.py > {PIPE_STDIN}", stdin=subprocess.PIPE, shell=True)
+
+        print("Start demo")
 
         for data in container.logs(stream=True):
             print(f"runner: {data.decode()}")
