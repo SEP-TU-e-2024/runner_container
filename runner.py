@@ -23,13 +23,10 @@ class Runner():
         mount = Mount(target='/tmp/test', source=PIPE_STDOUT, type='bind')
         container = self.docker_client.containers.run(image=self.docker_image, mounts=[mount], detach=True)
 
-        subprocess.Popen("echo boiler > /tmp/test", shell=True)
-        #subprocess.Popen("cat /tmp/test", shell=True)
+        subprocess.Popen("python3 validator.py > /tmp/test", shell=True)
 
-        print('waiting')
-        time.sleep(2)
-
-        print(container.logs().decode())
+        for data  in container.logs(stream=True):
+            print(data)
 
 #----------------------------------------------------------------
 # TESTING

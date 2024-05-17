@@ -13,3 +13,6 @@ MVP requirements are achieved and the container runs without any issues. All imp
 Using container.logs(stream=True), this returns a blocking stream object where you can process output as they happen
 
 Using named pipes: make pipes somewhere on your system (example: /tmp/pipe) and then mount these pipes to your docker container
+
+Using devices: in docker.containers.run you can specify devicise the container has access to, you might be able to connect it to /dev/stdout
+and /dev/stdin
