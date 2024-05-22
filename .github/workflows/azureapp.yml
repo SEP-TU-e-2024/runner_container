@@ -25,19 +25,19 @@ jobs:
       uses: azure/cli@v2
       with:
         azcliversion: latest
-        inlineScript: az ad sp show --id ${{ secrets.AZURE_CREDENTIALS.clientId }}
+        inlineScript: az ad sp show --id $(echo ${{ secrets.AZURE_CREDENTIALS }} | jq -r .clientId)
     
     - name: Show Current Azure User 2
       uses: azure/cli@v2
       with:
         azcliversion: latest
-        inlineScript: az role assignment list --assignee ${{ secrets.AZURE_CREDENTIALS.clientId }}
+        inlineScript: az role assignment list --assignee $(echo ${{ secrets.AZURE_CREDENTIALS }} | jq -r .clientId)
         
     - name: Show Current Azure User 3
       uses: azure/cli@v2
       with:
         azcliversion: latest
-        inlineScript: az role assignment list --assignee ${{ secrets.AZURE_CREDENTIALS.clientId }} --scope $(az storage account show --name benchlabtestappstorage --query id --output tsv)
+        inlineScript: az role assignment list --assignee $(echo ${{ secrets.AZURE_CREDENTIALS }} | jq -r .clientId) --scope $(az storage account show --name benchlabtestappstorage --query id --output tsv)
 
     - name: Upload Zip to Azure Storage
       uses: azure/cli@v2
