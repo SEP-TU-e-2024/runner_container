@@ -26,10 +26,11 @@ jobs:
       with:
         azcliversion: latest
         inlineScript: |
+          TAG_NAME=${GITHUB_REF##*/}
           az storage blob upload \
             --account-name benchlabtestappstorage \
             --container-name testapp \
-            --name app.zip \
+            --name app-$TAG_NAME.zip \
             --file app.zip \
             --auth-mode login
 
@@ -45,6 +46,6 @@ jobs:
             --application-name runner_container_application \
             --version-name $TAG_NAME \
             --location uksouth \
-            --package-file-link "https://benchlabtestappstorage.blob.core.windows.net/testapp/app.zip" \
-            --install-command "unzip -o app.zip && chmod +x install.sh && ./install.sh" \
+            --package-file-link "https://benchlabtestappstorage.blob.core.windows.net/testapp/app-$TAG_NAME.zip" \
+            --install-command "unzip -o app-$TAG_NAME.zip && chmod +x install.sh && ./install.sh" \
             --remove-command "./uninstall.sh"
