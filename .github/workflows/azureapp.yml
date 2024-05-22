@@ -19,7 +19,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Create Zip of azure directory
-      run: zip -r app.zip -x .git/\* -x .github/\*
+      run: zip -r app.zip . -x .git/\* -x .github/\*
 
     - name: Upload Zip to Azure Storage
       uses: azure/cli@v2
