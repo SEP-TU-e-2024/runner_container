@@ -21,6 +21,12 @@ jobs:
     - name: Create Zip of azure directory
       run: zip -r app.zip azure/
 
+    - name: Show Current Azure User
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: az ad signed-in-user show
+
     - name: Upload Zip to Azure Storage
       uses: azure/cli@v2
       with:
