@@ -25,7 +25,7 @@ jobs:
       uses: azure/cli@v2
       with:
         azcliversion: latest
-        inlineScript: az ad sp show --id $(echo ${{ secrets.AZURE_CREDENTIALS }} | jq -r .clientId)
+        inlineScript: az ad sp show --id $(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r .clientId)
     
     - name: Show Current Azure User 2
       uses: azure/cli@v2
