@@ -1,7 +1,10 @@
-from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS
+import os
+
 import docker
 from docker.types import Mount
-import os
+
+from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
+
 
 class Runner():
     def __init__(self):
