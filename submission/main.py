@@ -1,5 +1,6 @@
 import validator
 
+
 def main():
     print("ey bruv why you walkin")
     v = validator.Validator()
