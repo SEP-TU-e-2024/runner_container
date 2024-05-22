@@ -1,4 +1,4 @@
-name: Create and Deploy Zip on Tag
+name: Update Azure VM Application
 
 on:
   push:
@@ -18,18 +18,18 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Create Zip of azure directory
+    - name: Create zip of repository
       run: zip -r app.zip . -x .git/\* -x .github/\*
 
-    - name: Upload Zip to Azure Storage
+    - name: Upload zip to Azure Storage
       uses: azure/cli@v2
       with:
         azcliversion: latest
         inlineScript: |
           TAG_NAME=${GITHUB_REF##*/}
           az storage blob upload \
-            --account-name benchlabtestappstorage \
-            --container-name testapp \
+            --account-name ${{ vars.API_KEY }} \
+            --container-name ${{ vars.AZURE_APP_STORAGE_CONTAINER }} \
             --name app-$TAG_NAME.zip \
             --file app.zip \
             --auth-mode login
@@ -41,11 +41,11 @@ jobs:
         inlineScript: |
           TAG_NAME=${GITHUB_REF##*/}
           az sig gallery-application version create \
-            --resource-group judge-queuer \
-            --gallery-name testgallery \
-            --application-name runner_container_application \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --gallery-name ${{ vars.AZURE_APP_STORAGE_GALLERY }} \
+            --application-name ${{ vars.AZURE_VM_APPLICATION_NAME }} \
             --version-name $TAG_NAME \
-            --location uksouth \
-            --package-file-link "https://benchlabtestappstorage.blob.core.windows.net/testapp/app-$TAG_NAME.zip" \
+            --location ${{ vars.AZURE_LOCATION }} \
+            --package-file-link "https://${{ vars.API_KEY }}.blob.core.windows.net/${{ vars.AZURE_APP_STORAGE_CONTAINER }}/app-$TAG_NAME.zip" \
             --install-command "apt-get update && apt-get install -y unzip && unzip -o app-$TAG_NAME.zip && chmod +x azure/install.sh && ./azure/install.sh" \
             --remove-command "chmod +x azure/uninstall.sh && ./azure/uninstall.sh"
