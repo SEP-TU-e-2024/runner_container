@@ -1,5 +1,4 @@
-from settings import *
-
+from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS
 import docker
 from docker.types import Mount
 import os
