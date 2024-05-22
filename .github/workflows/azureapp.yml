@@ -28,7 +28,7 @@ jobs:
         inlineScript: |
           TAG_NAME=${GITHUB_REF##*/}
           az storage blob upload \
-            --account-name ${{ vars.API_KEY }} \
+            --account-name ${{ vars.AZURE_APP_STORAGE }} \
             --container-name ${{ vars.AZURE_APP_STORAGE_CONTAINER }} \
             --name app-$TAG_NAME.zip \
             --file app.zip \
