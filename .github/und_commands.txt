@@ -1,6 +1,5 @@
 create -languages Python C++ web src_db.und
-add runner.py
-add settings.py
+add *.py
 add validator/
 settings -reportOutputDirectory htmlDir
 settings -metricsOutputFile metrics.csv
