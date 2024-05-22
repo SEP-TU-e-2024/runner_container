@@ -8,7 +8,6 @@ source env/bin/activate
 # install the requirements
 # python3 -m pip install --upgrade pip
 pip install -r /code/requirements.txt
-deactivate
 
 # copy the code and library to the a folder where the code will be run
 cp -r /code/. /runner

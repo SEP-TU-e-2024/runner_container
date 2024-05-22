@@ -6,31 +6,30 @@ import time
 import json
 
 docker_client = docker.from_env()
-imagefile = "runner_container"
-code_path = "/repository"
-
-metrics_path = "/metrics"
-
+root_path = "/home/vlad/"
+imagefile = "runnercontainer"
+code_path = root_path+"code"
+metrics_path = root_path+"metrics"
 
 def generate_string(len):
     characters = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(characters) for i in range(len))
     return password
 
-#listen for web requests and unzip the received file in a clean working folder
+# listen for web requests and unzip the received file in a clean working folder
 
 def main():
     # listen for web requests
     # unzip the received file in a clean working folder
     # read and parse the metadata of the current problem
-    metadata = open("metadata.json", "r")
+    metadata = open(code_path+"/metadata.json", "r")
     parsed_metadata = json.loads(metadata.read())
     time_limit = parsed_metadata["time_limit"]
-    memory_limit = parsed_metadata["memory_limit"] + "m"
+    memory_limit = str(parsed_metadata["memory_limit"]) + "m"
 
     # create a container and attach the relevant drives to the container
     problem_name = "default_problem"
-    library_path = "~/problems"+problem_name+"/library"
+    library_path = root_path+"problems/"+problem_name+"/library"
     id = generate_string(12);
     container = docker_client.containers.run(
             image=imagefile,
