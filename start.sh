@@ -5,4 +5,5 @@ cp -r validator/** /runenv
 
 cd runenv
 
-ls -la .
+python main.py
+ls -la /

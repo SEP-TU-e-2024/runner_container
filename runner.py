@@ -12,16 +12,20 @@ class Runner():
 
         self._config_mounts()
         self.container = self.docker_client.containers.create(image=self.docker_image, mounts=self.mounts, detach=True)
+        #self.container = self.docker_client.containers.create(image=DOCKER_IMAGE, mounts=self.mounts, detach=True)
     
     def _config_mounts(self):
         cwd = os.getcwd()
         self.mounts = [Mount(target=DOCKER_SUBMISSION, source=f'{cwd}{DOCKER_SUBMISSION}', type="bind", read_only=True),
-                       Mount(target=DOCKER_VALIDATOR, source=f'{cwd}{DOCKER_VALIDATOR}', type="bind", read_only=True)]
+                       Mount(target=DOCKER_VALIDATOR, source=f'{cwd}{DOCKER_VALIDATOR}', type="bind", read_only=True),
+                       Mount(target=DOCKER_RESULTS, source=f'{cwd}{DOCKER_RESULTS}', type="bind", read_only=False)]
 
     def run(self):
+        print("Running...")
         self.container.start()
 
-        print(self.container.logs().decode())
+        for data in self.container.logs(stream=True):
+            print(f"{data.decode()}", end='')
 
 #----------------------------------------------------------------
 # TESTING
