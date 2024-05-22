@@ -21,24 +21,6 @@ jobs:
     - name: Create Zip of azure directory
       run: zip -r app.zip azure/
 
-    - name: Show Current Azure User
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: az ad sp show --id $(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r .clientId)
-    
-    - name: Show Current Azure User 2
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: az role assignment list --assignee $(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r .clientId)
-        
-    - name: Show Current Azure User 3
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: az role assignment list --assignee $(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r .clientId) --scope $(az storage account show --name benchlabtestappstorage --query id --output tsv)
-
     - name: Upload Zip to Azure Storage
       uses: azure/cli@v2
       with:
@@ -57,13 +39,12 @@ jobs:
         azcliversion: latest
         inlineScript: |
           TAG_NAME=${GITHUB_REF##*/}
-          az sig application-version create \
-            --resource-group myResourceGroup \
-            --gallery-name myGalleryName \
-            --gallery-application-definition runner_container_application \
-            --gallery-application-version $TAG_NAME \
+          az sig gallery-application version create \
+            --resource-group judge-queuer \
+            --gallery-name testgallery \
+            --application-name runner_container_application \
+            --version-name $TAG_NAME \
             --location uksouth \
-            --source uri=https://benchlabtestappstorage.blob.core.windows.net/testapp/app.zip \
-            --manage-with-artifact-url true \
-            --install-command "./install.sh" \
-            --uninstall-command "./uninstall.sh"
+            --package-file-link "https://benchlabtestappstorage.blob.core.windows.net/testapp/app.zip" \
+            --install-command "unzip -o app.zip && chmod +x install.sh && ./install.sh" \
+            --remove-command "./uninstall.sh"
