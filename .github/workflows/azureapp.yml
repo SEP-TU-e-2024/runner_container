@@ -1,0 +1,51 @@
+name: Create and Deploy Zip on Tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Create Zip of azure directory
+      run: zip -r app.zip azure/
+
+    - name: Upload Zip to Azure Storage
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az storage blob upload \
+            --account-name benchlabtestappstorage \
+            --container-name testapp \
+            --name app.zip \
+            --file app.zip \
+            --auth-mode login
+
+    - name: Create VM Application Version
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          TAG_NAME=${GITHUB_REF##*/}
+          az sig application-version create \
+            --resource-group myResourceGroup \
+            --gallery-name myGalleryName \
+            --gallery-application-definition runner_container_application \
+            --gallery-application-version $TAG_NAME \
+            --location uksouth \
+            --source uri=https://benchlabtestappstorage.blob.core.windows.net/testapp/app.zip \
+            --manage-with-artifact-url true \
+            --install-command "./install.sh" \
+            --uninstall-command "./uninstall.sh"
