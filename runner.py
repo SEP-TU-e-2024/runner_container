@@ -6,8 +6,6 @@ from docker.types import Mount
 import subprocess
 import time
 
-PIPE_STDIN = '/tmp/stdin'
-
 class Runner():
     def __init__(self):
         self.docker_client = docker.from_env()
