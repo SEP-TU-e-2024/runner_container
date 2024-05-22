@@ -1,11 +1,11 @@
-import validator
+# Dummy code for testing functionality of the IOModule
 
+from validator import Validator
 
-def main():
-    print("ey bruv why you walkin")
-    v = validator.Validator()
-    v.submit(3)
-    print(v.get_state())
+io = Validator()
 
-if __name__ == "__main__":
-    main()
+a = io.obtain_data("Enter a number: ")
+b = io.obtain_data("Enter another number: ")
+sum = int(a) + int(b)
+
+io.push_data(str(sum))
