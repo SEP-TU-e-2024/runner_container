@@ -1,7 +1,6 @@
 create -languages Python C++ web src_db.und
-add backend/api/
-add backend/backend/
-add frontend/src/
+add *.py
+add validator/
 settings -reportOutputDirectory htmlDir
 settings -metricsOutputFile metrics.csv
 analyze
