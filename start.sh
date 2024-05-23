@@ -1,5 +1,6 @@
 mkdir runenv
 
+# This is just for testing, use pip env in final code
 pip install -r submission/requirements.txt
 pip install -r validator/requirements.txt
 
