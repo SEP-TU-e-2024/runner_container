@@ -1,42 +1,47 @@
-import json
-from socket import socket, AF_INET, SOCK_STREAM, SHUT_RD, SHUT_WR
+import threading
+
 
 def main():
     # listen for web requests
 
-    PORT = 12345  # change this later
-
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.bind(("localhost", PORT))
-    sock.listen(1)
-
+    main.start()
+    
     while True:
-        client_sock, addr = sock.accept()
-        client_sock.settimeout(5)
+        main.await_request()
+        threading.Thread(target=None).start()
+        
+        
+        pass
+    
+    # sock.listen(1)
 
-        databuffer = bytearray()
+    # while True:
+    #     client_sock, _ = sock.accept()
+    #     client_sock.settimeout(5)
 
-        recv_data = 1
-        while recv_data:
-            recv_data = client_sock.recv(1024)
-            databuffer = databuffer + recv_data
+    #     databuffer = bytearray()
 
-        client_sock.shutdown(SHUT_RD)
+    #     recv_data = 1
+    #     while recv_data:
+    #         recv_data = client_sock.recv(1024)
+    #         databuffer = databuffer + recv_data
 
-        databuffer = databuffer.decode()
-        json_obj = json.loads(databuffer)
+    #     client_sock.shutdown(SHUT_RD)
 
-        print(json_obj)
+    #     databuffer = databuffer.decode()
+    #     json_obj = json.loads(databuffer)
 
-        databuffer = bytearray()
-        result = {"Sigma" : "YES", "test" : [1, 2, 3]}
+    #     print(json_obj)
 
-        json_obj = json.dumps(result)
+    #     databuffer = bytearray()
+    #     result = {"Sigma" : "YES", "test" : [1, 2, 3]}
 
-        client_sock.send(json_obj.encode())
+    #     json_obj = json.dumps(result)
 
-        client_sock.shutdown(SHUT_WR)
-        client_sock.close()
+    #     client_sock.send(json_obj.encode())
+
+    #     client_sock.shutdown(SHUT_WR)
+    #     client_sock.close()
 
 
 if __name__ == "__main__":
