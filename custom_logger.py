@@ -1,9 +1,9 @@
-import logging
-import os
-
 """
 The main logger to be used by the program.
 """
+
+import logging
+import os
 
 main_logger: logging.Logger = logging.getLogger("runner")
 
@@ -20,11 +20,7 @@ def setup():
     formatter_c = logging.Formatter(
         "%(asctime)s  [\033[93m%(pathname)s:%(lineno)d\033[0m]  %(levelname)s: %(message)s"
     )
-    # formatter_f = logging.Formatter(
-    #     "%(asctime)s  [%(pathname)s:%(lineno)d]  %(levelname)s: %(message)s"
-    # )
 
-    # Add console log handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter_c)

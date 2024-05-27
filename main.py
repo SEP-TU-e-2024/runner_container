@@ -42,15 +42,11 @@ def _connect(sock: socket):
 
 
 def _handle_requests(sock: socket):
-    protocol.send_init(sock)
-
     while True:
-        protocol.receive(sock)
-
-    pass
+        protocol.receive_command(sock)
 
 
-def _stop(sock: socket):
+def _stop(sock: socket.socket):
     """
     Closes the connection to the judge server.
     """
