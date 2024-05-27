@@ -5,7 +5,7 @@ from time import sleep
 import protocol
 from custom_logger import main_logger
 
-JUDGE_HOST = "localhost"  # TODO: change this to the judge local IP
+JUDGE_HOST = "localhost"  # Change this to the Judge local IP
 PORT = 12345  # TODO: find a nice port to use
 
 logger = main_logger.getChild("runner")

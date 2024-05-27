@@ -9,6 +9,7 @@ def send(message: dict, sock: socket.socket):
     json_message = json.dumps(message)
     data = json_message.encode()
     data_size = len(data)
+    print(data_size)
     sock.sendall(data_size.to_bytes(4, byteorder="big"))
     sock.sendall(data)
 
@@ -21,8 +22,10 @@ def receive(sock: socket.socket, timeout: int = 0) -> dict:
     """
 
     sock.settimeout(timeout)
-    data_size = int.from_bytes(sock.recv(1024), byteorder="big")
+    data_size = int.from_bytes(sock.recv(4), byteorder="big")
     sock.settimeout(0)
+
+    print(data_size)
 
     data = sock.recv(data_size)
     message = json.loads(data.decode())
@@ -41,5 +44,7 @@ def receive_init(sock: socket.socket):
     if message["status"] is None:
         raise ValueError("Received message with missing status!")
 
-    if message["status"] != "ready":
-        raise ValueError(f"Unexpected respone! Expected \"ready\" and got \"{message['status']}\"")
+    status = message["status"]
+
+    if status != "ready":
+        raise ValueError(f'Unexpected respone! Expected "ready" and got "{status}"')

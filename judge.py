@@ -5,10 +5,13 @@ import threading
 import protocol
 from custom_logger import main_logger
 
+HOST = "localhost"
+PORT = 12345
+
 logger = main_logger.getChild("judge")
 sock_lock = threading.Lock()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(("localhost", 12345))
+sock.bind((HOST, PORT))
 sock.listen(1000)
 
 
@@ -40,6 +43,8 @@ def _handle_requests(client_socket: socket.socket, addr: tuple[str, int]):
 
 
 def main():
+    logger.info(f"Judge server started on {HOST}:{PORT}.")
+
     while True:
         client_socket, addr = sock.accept()
 
