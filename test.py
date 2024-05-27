@@ -1,3 +1,7 @@
+"""
+This module is used for testing the connection between the judge and a runner (or possibly multiple ones).
+"""
+
 import threading
 from time import sleep
 

@@ -1,5 +1,11 @@
+"""
+This module containes the protocol used for communication between the judge server and the runner.
+"""
+
 import json
 import socket
+from abc import ABC, abstractmethod
+from enum import Enum
 
 
 def send(message: dict, sock: socket.socket):
@@ -34,7 +40,7 @@ def receive(sock: socket.socket, timeout: int = 0) -> dict:
 
 
 def send_init(sock: socket.socket):
-    message = {"status": "ready"}
+    message = {"status": "ok"}
     send(message, sock)
 
 
@@ -46,5 +52,45 @@ def receive_init(sock: socket.socket):
 
     status = message["status"]
 
-    if status != "ready":
-        raise ValueError(f'Unexpected respone! Expected "ready" and got "{status}"')
+    if status != "ok":
+        raise ValueError(f'Unexpected respone! Expected "ok" and got "{status}"')
+
+
+class Command(ABC):
+    name = None
+
+    @abstractmethod
+    def execute(self):
+        pass
+
+
+class StartCommand(Command):
+    name = "start"
+
+    def execute(self):
+        pass
+
+
+class Commands(Enum):
+    START = StartCommand()
+    """
+    """
+
+    STOP = "stop"
+    """
+    """
+
+    CHECK = "check"
+    """
+    """
+
+    class Arguments:
+        pass
+
+    class Action:
+        pass
+
+
+def send_command(command: Commands, sock: socket.socket, **kwargs):
+    message = {"command": command.value.name, "args": kwargs}
+    send(message, sock)

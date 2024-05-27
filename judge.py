@@ -1,3 +1,7 @@
+"""
+Test judge module.
+"""
+
 import errno
 import socket
 import threading

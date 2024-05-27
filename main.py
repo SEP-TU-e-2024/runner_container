@@ -1,3 +1,7 @@
+"""
+The main class of the runner server. It handles the connection to the judge server.
+"""
+
 import socket
 import sys
 from time import sleep
@@ -6,17 +10,29 @@ import protocol
 from custom_logger import main_logger
 
 JUDGE_HOST = "localhost"  # Change this to the Judge local IP
-PORT = 12345  # TODO: find a nice port to use
+"""
+Host of the the Judge server.
+"""
+
+JUDGE_PORT = 12345
+"""
+The port of the Judge server.
+"""
+
+RETRY_WAIT = 5
+"""
+Time in seconds to wait before retrying to connect to the Judge server
+"""
 
 logger = main_logger.getChild("runner")
 
 
 def _connect(sock: socket):
-    logger.info(f"Trying to connect to the Judge server at {JUDGE_HOST}:{PORT} ...")
-    
+    logger.info(f"Trying to connect to the Judge server at {JUDGE_HOST}:{JUDGE_PORT} ...")
+
     while True:
         try:
-            sock.connect((JUDGE_HOST, PORT))
+            sock.connect((JUDGE_HOST, JUDGE_PORT))
             break
         except Exception as e:
             logger.info(
@@ -26,18 +42,10 @@ def _connect(sock: socket):
 
 
 def _handle_requests(sock: socket):
-    
     protocol.send_init(sock)
 
-    # while True:
-    #     databuffer = bytearray()
-
-    #     recv_data = 1
-    #     while recv_data:
-    #         recv_data = sock.recv(1024)
-    #         databuffer = databuffer + recv_data
-
-    #     databuffer = databuffer.decode()
+    while True:
+        protocol.receive(sock)
 
     pass
 
