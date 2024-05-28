@@ -7,11 +7,11 @@ import socket
 
 from custom_logger import main_logger
 
-# import threading
 from .commands import Commands
 
-logger = main_logger.getChild("protocol")
+VERSION = "0.0.1"
 
+logger = main_logger.getChild("protocol")
 
 def send(sock: socket.socket, message: dict):
     """
@@ -58,7 +58,7 @@ def send_command(sock: socket.socket, command: Commands, **kwargs):
     command.value.response(sock)
 
 
-def receive_command(sock: socket.socket) -> Commands:
+def receive_command(sock: socket.socket):
     message = receive(sock)
 
     command_name = message["command"]

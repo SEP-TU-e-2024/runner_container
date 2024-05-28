@@ -8,21 +8,7 @@ from time import sleep
 
 import protocol
 from custom_logger import main_logger
-
-JUDGE_HOST = "localhost"  # Change this to the Judge local IP
-"""
-Host of the the Judge server.
-"""
-
-JUDGE_PORT = 12345
-"""
-The port of the Judge server.
-"""
-
-RETRY_WAIT = 5
-"""
-Time in seconds to wait before retrying to connect to the Judge server
-"""
+from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
 
 logger = main_logger.getChild("runner")
 
@@ -38,7 +24,7 @@ def _connect(sock: socket):
             logger.info(
                 f"{e}. Failed to connect to judge server. Retrying in 5 seconds...", file=sys.stderr
             )
-            sleep(5)
+            sleep(RETRY_WAIT)
 
 
 def _handle_requests(sock: socket):
