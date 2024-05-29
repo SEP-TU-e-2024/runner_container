@@ -10,10 +10,8 @@ class RunnerProtocol(Protocol):
         """
         Handles the incoming commands from the judge server.
         """
-        try:
-            message = Protocol.receive(connection)
-        except Exception as e:
-            raise e
+
+        message = Protocol.receive(connection)
 
         command_name = message["command"]
         command_args = message["args"]
