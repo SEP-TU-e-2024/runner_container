@@ -6,14 +6,14 @@ import threading
 from time import sleep
 
 import judge
-import main
+import runner
 
 
 def test():
     judge_thread = threading.Thread(target=judge.main)
     judge_thread.start()
     sleep(2)
-    runner_thread = threading.Thread(target=main.main)
+    runner_thread = threading.Thread(target=runner.main)
     runner_thread.start()
 
     runner_thread.join()
