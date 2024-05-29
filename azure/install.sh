@@ -30,6 +30,8 @@ pip install -r requirements.txt
 # Copy judge runner to final program location
 cp -r ./ /usr/local/bin/judge_runner/
 
+ENTRY=mycode.py
+chmod +x /usr/local/bin/judge_runner/$ENTRY
 
 # Create a systemd service file
 echo "-- Creating service"
@@ -40,11 +42,11 @@ Description=BenchLab Judge Runner Service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/judge_runner/mycode.py
+ExecStart=/usr/local/bin/judge_runner/$ENTRY
 WorkingDirectory=/usr/local/bin/judge_runner
 Restart=always
-User=nobody
-Group=nogroup
+User=root
+Group=root
 
 [Install]
 WantedBy=multi-user.target" | sudo tee $SERVICE_FILE
