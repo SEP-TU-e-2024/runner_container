@@ -14,7 +14,7 @@ class Commands(Enum):
     # Stops a certain task of the runner.
     # """
 
-    CHECK = CheckCommand()
+    CHECK = "CHECK"
     """
     Checks if the runner is still alive.
     """

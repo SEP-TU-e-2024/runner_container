@@ -8,7 +8,7 @@ import threading
 
 import protocol
 from custom_logger import main_logger
-from protocol.commands import Commands
+from protocol.commands_OLD import Commands
 
 HOST = "localhost"
 PORT = 12345

@@ -6,8 +6,8 @@ import socket
 import sys
 from time import sleep
 
-import protocol
 from custom_logger import main_logger
+from protocol.runner import RunnerProtocol
 from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
 
 logger = main_logger.getChild("runner")
@@ -29,7 +29,7 @@ def _connect(sock: socket):
 
 def _handle_requests(sock: socket):
     while True:
-        protocol.receive_command(sock)
+        RunnerProtocol.receive_command(sock)
 
 
 def _stop(sock: socket.socket):
