@@ -71,4 +71,10 @@ def main():
 
 
 if __name__ == "__main__":
+    # try:
     main()
+    # except KeyboardInterrupt:
+    #     logger.info("Shutting down the judge server...")
+    #     sock.shutdown(socket.SHUT_RDWR)
+    #     sock.close()
+    #     exit(0)

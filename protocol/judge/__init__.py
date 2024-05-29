@@ -25,6 +25,12 @@ class Command(ABC):
     @abstractmethod
     def response(message: dict):
         pass
+    
+    
+class StartCommand(Command):
+    @staticmethod
+    def response(message: dict):
+        pass
 
 
 class CheckCommand(Command):

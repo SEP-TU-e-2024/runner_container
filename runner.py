@@ -59,11 +59,12 @@ class Runner:
 
 def main():
     runner = Runner(JUDGE_HOST, JUDGE_PORT)
-    try:
-        runner.start()
-    except KeyboardInterrupt:
-        logger.info("Shutting down the runner server...")
-        runner.stop()
+    # try:
+    runner.start()
+    # except KeyboardInterrupt:
+    #     logger.info("Shutting down the runner server...")
+    #     runner.stop()
+    #     exit(0)
 
 
 if __name__ == "__main__":
