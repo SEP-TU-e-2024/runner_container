@@ -30,10 +30,12 @@ pip install -r requirements.txt
 # Copy judge runner to final program location
 cp -r ./ /usr/local/bin/judge_runner/
 
+# Make 
 ENTRY=mycode.py
 chmod +x /usr/local/bin/judge_runner/$ENTRY
 
-# Create a systemd service file
+
+# Define service
 echo "-- Creating service"
 SERVICE_FILE=/etc/systemd/system/benchlab-judge-runner.service
 
@@ -52,13 +54,10 @@ Group=root
 WantedBy=multi-user.target" | tee $SERVICE_FILE
 
 
-# Reload the systemd manager configuration
+# Load, enable and start service
+echo "-- Starting service"
 systemctl daemon-reload
-
-# Enable the service to start on boot
 systemctl enable benchlab-judge-runner.service
-
-# Start the service immediately
 systemctl start benchlab-judge-runner.service
 
 echo "-- All done"
