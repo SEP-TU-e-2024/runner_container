@@ -67,7 +67,7 @@ HEALTHCHECK_INTERVAL=1  # seconds
 HEALTHCHECK_DURATION=5 # seconds
 HEALTHCHECK_PASSED=false
 
-for ((i=0; i<HEALTHCHECK_DURATION; i+=HEALTHCHECK_INTERVAL)); do
+for ((i=1; i<=HEALTHCHECK_DURATION; i+=HEALTHCHECK_INTERVAL)); do
     sleep $HEALTHCHECK_INTERVAL
     SERVICE_STATUS=$(systemctl is-active benchlab-judge-runner.service)
     if [[ "$SERVICE_STATUS" == "active" ]]; then
