@@ -60,4 +60,33 @@ systemctl daemon-reload
 systemctl enable benchlab-judge-runner.service
 systemctl start benchlab-judge-runner.service
 
+# TODO: wait until service started & stable?
+
+# Health check: Wait until the service has been running stably for a few seconds
+HEALTHCHECK_INTERVAL=1  # seconds
+HEALTHCHECK_DURATION=5 # seconds
+HEALTHCHECK_PASSED=false
+
+for ((i=0; i<HEALTHCHECK_DURATION; i+=HEALTHCHECK_INTERVAL)); do
+    sleep $HEALTHCHECK_INTERVAL
+    SERVICE_STATUS=$(systemctl is-active benchlab-judge-runner.service)
+    if [[ "$SERVICE_STATUS" == "active" ]]; then
+        echo "Service is running... ($i seconds)"
+        if [[ $i -ge $HEALTHCHECK_DURATION ]]; then
+            HEALTHCHECK_PASSED=true
+            break
+        fi
+    else
+        echo "Service is not running properly. Status: $SERVICE_STATUS"
+        break
+    fi
+done
+
+if $HEALTHCHECK_PASSED; then
+    echo "Health check passed: The BenchLab Judge Runner service is running stably."
+else
+    echo "Health check failed: The BenchLab Judge Runner service did not reach stable running state."
+    exit 1
+fi
+
 echo "-- All done"
