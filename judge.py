@@ -6,9 +6,9 @@ import errno
 import socket
 import threading
 
-import protocol
 from custom_logger import main_logger
-from protocol.commands_OLD import Commands
+from protocol import Connection
+from protocol.judge import Commands, JudgeProtocol
 
 HOST = "localhost"
 PORT = 12345
@@ -16,7 +16,6 @@ PORT = 12345
 runners = []
 
 logger = main_logger.getChild("judge")
-sock_lock = threading.Lock()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind((HOST, PORT))
 sock.listen(1000)
@@ -24,13 +23,14 @@ sock.listen(1000)
 
 def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     ip, port = addr
+    connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
 
     try:
         logger.info(
             f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
         )
-        protocol.send_command(client_socket, Commands.CHECK)
+        JudgeProtocol.send_command(connection, Commands.CHECK)
         logger.info(f"Runner with IP {ip} on port {port} initialized.")
 
         # logger.info(f"Trying to retrieve the type of the runner with IP {ip} on port {port}...")
@@ -68,6 +68,7 @@ def main():
         thread = threading.Thread(target=_handle_connections, args=(client_socket, addr))
         thread.daemon = True
         thread.start()
+
 
 if __name__ == "__main__":
     main()

@@ -1,18 +1,18 @@
-import socket
+from custom_logger import main_logger
+from protocol import Connection, Protocol
 
-from protocol import Protocol
+main_logger = main_logger.getChild("protocol.runner")
 
 
 class RunnerProtocol(Protocol):
-    
     @staticmethod
-    def receive_command(sock: socket.socket):
+    def receive_command(connection: Connection):
         """
+        Handles the incoming commands from the judge server.
         """
-        message = Protocol.receive(sock)
+        message = Protocol.receive(connection)
 
         command_name = message["command"]
         command_args = message["args"]
 
-        #command = Commands[command_name]
-        #command.value.execute(sock, **command_args)
+        main_logger.info(f"Received command: {command_name} with args: {command_args}")
