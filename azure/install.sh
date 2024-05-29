@@ -49,16 +49,16 @@ User=root
 Group=root
 
 [Install]
-WantedBy=multi-user.target" | sudo tee $SERVICE_FILE
+WantedBy=multi-user.target" | tee $SERVICE_FILE
 
 
 # Reload the systemd manager configuration
-sudo systemctl daemon-reload
+systemctl daemon-reload
 
 # Enable the service to start on boot
-sudo systemctl enable benchlab-judge-runner.service
+systemctl enable benchlab-judge-runner.service
 
 # Start the service immediately
-sudo systemctl start benchlab-judge-runner.service
+systemctl start benchlab-judge-runner.service
 
 echo "-- All done"
