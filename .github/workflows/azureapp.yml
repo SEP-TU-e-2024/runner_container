@@ -1,0 +1,51 @@
+name: Update Azure VM Application
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Create zip of repository
+      run: zip -r app.zip . -x .git/\* -x .github/\*
+
+    - name: Upload zip to Azure Storage
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          TAG_NAME=${GITHUB_REF##*/}
+          az storage blob upload \
+            --account-name ${{ vars.AZURE_APP_STORAGE }} \
+            --container-name ${{ vars.AZURE_APP_STORAGE_CONTAINER }} \
+            --name app-$TAG_NAME.zip \
+            --file app.zip \
+            --auth-mode login
+
+    - name: Create VM Application Version
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          TAG_NAME=${GITHUB_REF##*/}
+          az sig gallery-application version create \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --gallery-name ${{ vars.AZURE_APP_STORAGE_GALLERY }} \
+            --application-name ${{ vars.AZURE_VM_APPLICATION_NAME }} \
+            --version-name $TAG_NAME \
+            --location ${{ vars.AZURE_LOCATION }} \
+            --package-file-link "https://${{ vars.AZURE_APP_STORAGE }}.blob.core.windows.net/${{ vars.AZURE_APP_STORAGE_CONTAINER }}/app-$TAG_NAME.zip" \
+            --install-command "apt-get install -y unzip && unzip -d judge_runner -o app-$TAG_NAME.zip && cd judge_runner && chmod +x azure/install.sh && ./azure/install.sh" \
+            --remove-command "chmod +x judge_runner/azure/uninstall.sh && ./judge_runner/azure/uninstall.sh"
