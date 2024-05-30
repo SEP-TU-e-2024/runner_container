@@ -19,13 +19,18 @@ class Runner:
     port: int
     debug: bool
     connection: Connection
+    threads: list[threading.Thread]
 
     def __init__(self, ip, port, debug=False):
         self.ip = ip
         self.port = port
         self.debug = debug
+        self.threads = []
 
     def start(self):
+        """
+        Starts the connection to the judge server. In case of a unexpected disconnection, it retries to connect.
+        """
         logger.info(f"Trying to connect to the Judge server at {self.ip}:{self.port} ...")
 
         while True:
@@ -36,6 +41,7 @@ class Runner:
                 self._handle_commands()
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
+                self.connection = None
                 logger.info(f"{e}. Failed to connect to judge server. Retrying in 5 seconds...")
                 sleep(RETRY_WAIT)
 
@@ -43,13 +49,22 @@ class Runner:
                 self.stop()
 
     def _handle_commands(self):
+        """
+        Handles the incoming commands from the judge server.
+        """
         while True:
-            RunnerProtocol.receive_command(self.connection)
+            command, args = RunnerProtocol.receive_command(self.connection)
+            thread = threading.Thread(target=command.execute, args=(self.connection, args))
+            thread.start()
+            self.threads.append(thread)
 
     def stop(self):
         """
         Closes the connection to the judge server.
         """
+        for thread in self.threads:
+            thread.join(1)
+            self.threads.clear()
         if self.connection is not None:
             sock = self.connection.sock
             sock.shutdown(socket.SHUT_RDWR)
@@ -58,6 +73,9 @@ class Runner:
 
 
 def main():
+    """
+    The main function of the runner server.
+    """
     runner = Runner(JUDGE_HOST, JUDGE_PORT)
     try:
         runner.start()

@@ -10,23 +10,13 @@ class Commands(Enum):
     STOP = "STOP"
 
 
-class JudgeProtocol(Protocol):
-    @staticmethod
-    def send_command(connection: Connection, command: Commands, **kwargs):
-        """
-        Sends a given command with the given arguemtents to the runner specifed in the connection.
-        """
-        message = {"command": command.value, "args": kwargs}
-        Protocol.send(connection, message)
-
-
 class Command(ABC):
     @staticmethod
     @abstractmethod
     def response(message: dict):
         pass
-    
-    
+
+
 class StartCommand(Command):
     @staticmethod
     def response(message: dict):
@@ -43,3 +33,13 @@ class CheckCommand(Command):
 
         if status != "ok":
             raise ValueError(f'Unexpected respone! Expected "ok" and got "{status}"')
+
+
+class JudgeProtocol(Protocol):
+    @staticmethod
+    def send_command(connection: Connection, command: Commands, **kwargs):
+        """
+        Sends a given command with the given arguemtents to the runner specifed in the connection.
+        """
+        message = {"command": command.value, "args": kwargs}
+        Protocol.send(connection, message)
