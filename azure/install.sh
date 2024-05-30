@@ -30,9 +30,8 @@ pip install -r requirements.txt
 # Copy judge runner to final program location
 cp -r ./ /usr/local/bin/judge_runner/
 
-# Make 
-ENTRY=mycode.py
-chmod +x /usr/local/bin/judge_runner/$ENTRY
+ENTRYPOINT=entrypoint.py
+chmod +x /usr/local/bin/judge_runner/$ENTRYPOINT
 
 
 # Define service
@@ -44,7 +43,7 @@ Description=BenchLab Judge Runner Service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/judge_runner/$ENTRY
+ExecStart=/usr/local/bin/judge_runner/$ENTRYPOINT
 WorkingDirectory=/usr/local/bin/judge_runner
 Restart=always
 User=root
@@ -60,37 +59,23 @@ systemctl daemon-reload
 systemctl enable benchlab-judge-runner.service
 systemctl start benchlab-judge-runner.service
 
-# Health check: wait until the service has been running stably for a few seconds
-HEALTHCHECK_INTERVAL=1 # seconds
-HEALTHCHECK_DURATION=5 # seconds
-HEALTHCHECK_PASSED=false
 
-for ((i=1; i<=HEALTHCHECK_DURATION; i+=HEALTHCHECK_INTERVAL)); do
-    sleep $HEALTHCHECK_INTERVAL
+# Wait for 3 seconds to see if service stable
+echo "-- Checking service health"
+sleep 3
 
-    SERVICE_STATUS=$(systemctl is-active benchlab-judge-runner.service)
-    if [[ "$SERVICE_STATUS" != "active" ]]; then
-        echo "Service is not running properly. Status: $SERVICE_STATUS"
-        HEALTHCHECK_PASSED=false
-        break
-    fi
-
-    RESTART_COUNT=$(systemctl show -p NRestarts benchlab-judge-runner.service | cut -d'=' -f2)
-    if [[ "$RESTART_COUNT" -gt 0 ]]; then
-        echo "Service has restarted $RESTART_COUNT times. Health check failed."
-        HEALTHCHECK_PASSED=false
-        break
-    fi
-
-    echo "Service is running... ($i seconds)"
-    HEALTHCHECK_PASSED=true
-done
-
-if $HEALTHCHECK_PASSED; then
-    echo "Health check passed: The BenchLab Judge Runner service is running stably."
-else
-    echo "Health check failed: The BenchLab Judge Runner service did not reach stable running state."
+RESTART_COUNT=$(systemctl show -p NRestarts benchlab-judge-runner.service | cut -d'=' -f2)
+if [[ "$RESTART_COUNT" -gt 0 ]]; then
+    echo "-- Service has restarted $RESTART_COUNT times. Health check failed."
     exit 1
 fi
+
+SERVICE_STATUS=$(systemctl is-active benchlab-judge-runner.service)
+if [[ "$SERVICE_STATUS" != "active" ]]; then
+    echo "-- Service is not running properly. Status: $SERVICE_STATUS"
+    exit 1
+fi
+
+echo "-- Health check passed"
 
 echo "-- All done"
