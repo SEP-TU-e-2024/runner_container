@@ -1,3 +1,7 @@
+"""
+This module contains the parts of the protocol used by the runner.
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 

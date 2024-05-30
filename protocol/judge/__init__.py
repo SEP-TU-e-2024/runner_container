@@ -1,3 +1,7 @@
+"""
+This module contains the parts of the protocol used by the judge.
+"""
+
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -8,6 +12,7 @@ class Command(ABC):
     """
     Base abstract class for commands.
     """
+
     @staticmethod
     @abstractmethod
     def response(message: dict):
