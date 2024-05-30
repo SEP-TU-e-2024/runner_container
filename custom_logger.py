@@ -15,6 +15,9 @@ main_logger.setLevel(logging.DEBUG)
 
 
 def setup():
+    """
+    Setup the logger.
+    """
     global main_logger
 
     formatter_c = logging.Formatter(

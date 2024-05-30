@@ -4,12 +4,6 @@ from enum import Enum
 from protocol import Connection, Protocol
 
 
-class Commands(Enum):
-    CHECK = "CHECK"
-    START = "START"
-    STOP = "STOP"
-
-
 class Command(ABC):
     @staticmethod
     @abstractmethod
@@ -34,6 +28,9 @@ class CheckCommand(Command):
         if status != "ok":
             raise ValueError(f'Unexpected respone! Expected "ok" and got "{status}"')
 
+class Commands(Enum):
+    START = StartCommand()
+    CHECK = CheckCommand()
 
 class JudgeProtocol(Protocol):
     @staticmethod
@@ -41,5 +38,6 @@ class JudgeProtocol(Protocol):
         """
         Sends a given command with the given arguemtents to the runner specifed in the connection.
         """
-        message = {"command": command.value, "args": kwargs}
+        message = {"command": command.name, "args": kwargs}
         Protocol.send(connection, message)
+
