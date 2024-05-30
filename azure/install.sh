@@ -30,7 +30,7 @@ pip install -r requirements.txt
 # Copy judge runner to final program location
 cp -r ./ /usr/local/bin/judge_runner/
 
-ENTRYPOINT=entrypoint.py
+ENTRYPOINT=runner.py
 chmod +x /usr/local/bin/judge_runner/$ENTRYPOINT
 
 
