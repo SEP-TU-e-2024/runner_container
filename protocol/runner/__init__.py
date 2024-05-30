@@ -8,13 +8,24 @@ main_logger = main_logger.getChild("protocol.runner")
 
 
 class Command(ABC):
+    """
+    Base abstract class for commands.
+    """
+
     @staticmethod
     @abstractmethod
     def execute(connection: Connection, args: dict):
+        """
+        Executes the command. It is recommended to call this in a separate thread.
+        """
         pass
 
 
 class CheckCommand(Command):
+    """
+    Command used to check the status of the runner.
+    """
+
     @staticmethod
     def execute(connection: Connection, args: dict):
         Protocol.send(connection, {"status": "ok"})

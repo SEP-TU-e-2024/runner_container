@@ -5,6 +5,9 @@ from protocol import Connection, Protocol
 
 
 class Command(ABC):
+    """
+    Base abstract class for commands.
+    """
     @staticmethod
     @abstractmethod
     def response(message: dict):
