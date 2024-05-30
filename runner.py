@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 The main class of the runner server. It handles the connection to the judge server.
 """
