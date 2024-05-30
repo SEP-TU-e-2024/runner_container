@@ -61,25 +61,29 @@ systemctl enable benchlab-judge-runner.service
 systemctl start benchlab-judge-runner.service
 
 # Health check: wait until the service has been running stably for a few seconds
-HEALTHCHECK_INTERVAL=1  # seconds
+HEALTHCHECK_INTERVAL=1 # seconds
 HEALTHCHECK_DURATION=5 # seconds
 HEALTHCHECK_PASSED=false
 
-# doesnt work yet, if crash and restarted immediately, it likely doesnt catch the crash
+for ((i=1; i<=HEALTHCHECK_DURATION; i+=CHECK_INTERVAL)); do
+    sleep $CHECK_INTERVAL
 
-for ((i=1; i<=HEALTHCHECK_DURATION; i+=HEALTHCHECK_INTERVAL)); do
-    sleep $HEALTHCHECK_INTERVAL
     SERVICE_STATUS=$(systemctl is-active benchlab-judge-runner.service)
-    if [[ "$SERVICE_STATUS" == "active" ]]; then
-        echo "Service is running... ($i seconds)"
-        if [[ $i -ge $HEALTHCHECK_DURATION ]]; then
-            HEALTHCHECK_PASSED=true
-            break
-        fi
-    else
+    if [[ "$SERVICE_STATUS" != "active" ]]; then
         echo "Service is not running properly. Status: $SERVICE_STATUS"
+        HEALTHCHECK_PASSED=false
         break
     fi
+
+    RESTART_COUNT=$(systemctl show -p NRestarts benchlab-judge-runner.service | cut -d'=' -f2)
+    if [[ "$RESTART_COUNT" -gt 0 ]]; then
+        echo "Service has restarted $RESTART_COUNT times. Health check failed."
+        HEALTHCHECK_PASSED=false
+        break
+    fi
+
+    echo "Service is running... ($i seconds)"
+    HEALTHCHECK_PASSED=true
 done
 
 if $HEALTHCHECK_PASSED; then
