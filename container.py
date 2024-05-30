@@ -1,3 +1,7 @@
+"""
+This module contains code used for creating and managing the containers created by the runner.
+"""
+
 import os
 
 import docker
@@ -21,6 +25,9 @@ class Container:
         # self.container = self.docker_client.containers.create(image=DOCKER_IMAGE, mounts=self.mounts, detach=True)
 
     def _config_mounts(self):
+        """
+        Configures the mounts for the container.
+        """
         cwd = os.getcwd()
         self.mounts = [
             Mount(
@@ -41,6 +48,9 @@ class Container:
         ]
 
     def run(self):
+        """
+        Run the container.
+        """
         print("Running...")
         self.container.start()
 

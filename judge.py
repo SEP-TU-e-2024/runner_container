@@ -1,5 +1,5 @@
 """
-Test judge module.
+Judge module used for testing the protocol between the judge and a runner (or possibly multiple ones).
 """
 
 import errno
@@ -22,6 +22,10 @@ sock.listen(1000)
 
 
 def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
+    """
+    Sends commands to the runners.
+    """
+
     ip, port = addr
     connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
@@ -59,6 +63,9 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
 
 
 def main():
+    """
+    The main function.
+    """
     logger.info(f"Judge server started on {HOST}:{PORT}.")
 
     while True:

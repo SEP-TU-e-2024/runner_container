@@ -28,9 +28,11 @@ class CheckCommand(Command):
         if status != "ok":
             raise ValueError(f'Unexpected respone! Expected "ok" and got "{status}"')
 
+
 class Commands(Enum):
     START = StartCommand()
     CHECK = CheckCommand()
+
 
 class JudgeProtocol(Protocol):
     @staticmethod
@@ -40,4 +42,3 @@ class JudgeProtocol(Protocol):
         """
         message = {"command": command.name, "args": kwargs}
         Protocol.send(connection, message)
-
