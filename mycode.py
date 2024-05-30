@@ -4,5 +4,5 @@ import time
 
 if __name__ == "__main__":
     print("Hello there")
-    time.sleep(2)
+    time.sleep(10)
     sys.exit(123)
