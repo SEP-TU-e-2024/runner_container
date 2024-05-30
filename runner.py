@@ -1,37 +1,89 @@
-import os
+"""
+The main class of the runner server. It handles the connection to the judge server.
+"""
 
-import docker
-from docker.types import Mount
+import socket
+import threading
+from time import sleep
 
-from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
+from custom_logger import main_logger
+from protocol import Connection
+from protocol.runner import RunnerProtocol
+from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
+
+logger = main_logger.getChild("runner")
 
 
-class Runner():
-    def __init__(self):
-        self.docker_client = docker.from_env()
-        self.docker_image, _ = self.docker_client.images.build(path=DOCKER_FILE_PARRENT_DIR) # this is temp, for testing its easier to just build the image every time
-        print("Done building image")
+class Runner:
+    ip: str
+    port: int
+    debug: bool
+    connection: Connection
+    threads: list[threading.Thread]
 
-        self._config_mounts()
-        self.container = self.docker_client.containers.create(image=self.docker_image, mounts=self.mounts, detach=True)
-        #self.container = self.docker_client.containers.create(image=DOCKER_IMAGE, mounts=self.mounts, detach=True)
-    
-    def _config_mounts(self):
-        cwd = os.getcwd()
-        self.mounts = [Mount(target=DOCKER_SUBMISSION, source=f'{cwd}{DOCKER_SUBMISSION}', type="bind", read_only=True),
-                       Mount(target=DOCKER_VALIDATOR, source=f'{cwd}{DOCKER_VALIDATOR}', type="bind", read_only=True),
-                       Mount(target=DOCKER_RESULTS, source=f'{cwd}{DOCKER_RESULTS}', type="bind", read_only=False)]
+    def __init__(self, ip, port, debug=False):
+        self.ip = ip
+        self.port = port
+        self.debug = debug
+        self.threads = []
 
-    def run(self):
-        print("Running...")
-        self.container.start()
+    def start(self):
+        """
+        Starts the connection to the judge server. In case of a unexpected disconnection, it retries to connect.
+        """
+        logger.info(f"Trying to connect to the Judge server at {self.ip}:{self.port} ...")
 
-        for data in self.container.logs(stream=True):
-            print(f"{data.decode()}", end='')
+        while True:
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((self.ip, self.port))
+                self.connection = Connection(self.ip, self.port, sock, threading.Lock())
+                self._handle_commands()
 
-#----------------------------------------------------------------
-# TESTING
-#----------------------------------------------------------------
+            except (ConnectionRefusedError, ConnectionResetError) as e:
+                self.connection = None
+                logger.info(f"{e}. Failed to connect to judge server. Retrying in 5 seconds...")
+                sleep(RETRY_WAIT)
+
+            finally:
+                self.stop()
+
+    def _handle_commands(self):
+        """
+        Handles the incoming commands from the judge server.
+        """
+        while True:
+            command, args = RunnerProtocol.receive_command(self.connection)
+            thread = threading.Thread(target=command.execute, args=(self.connection, args))
+            thread.start()
+            self.threads.append(thread)
+
+    def stop(self):
+        """
+        Closes the connection to the judge server.
+        """
+        for thread in self.threads:
+            thread.join(1)
+            self.threads.clear()
+        if self.connection is not None:
+            sock = self.connection.sock
+            sock.shutdown(socket.SHUT_RDWR)
+            sock.close()
+        self.connection = None
+
+
+def main():
+    """
+    The main function of the runner server.
+    """
+    runner = Runner(JUDGE_HOST, JUDGE_PORT)
+    try:
+        runner.start()
+    except KeyboardInterrupt:
+        logger.info("Shutting down the runner server...")
+        runner.stop()
+        exit(0)
+
+
 if __name__ == "__main__":
-    r = Runner()
-    r.run()
+    main()
