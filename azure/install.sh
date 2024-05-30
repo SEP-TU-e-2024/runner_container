@@ -23,8 +23,14 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 
 # Install Python and dependencies
 echo "-- Installing Python and dependencies"
-apt-get install -y python3 python3-pip
-pip install -r requirements.txt
+apt-get install -y software-properties-common wget
+add-apt-repository -y ppa:deadsnakes/ppa
+apt-get update
+apt-get install -y python3.12 python3.12-venv
+wget https://bootstrap.pypa.io/get-pip.py -O get-pip.py
+python3.12 get-pip.py
+
+python3.12 -m pip install -r requirements.txt
 
 
 # Copy judge runner to final program location
