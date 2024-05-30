@@ -50,3 +50,5 @@ class JudgeProtocol(Protocol):
         """
         message = {"command": command.name, "args": kwargs}
         Protocol.send(connection, message)
+        response = Protocol.receive(connection, 5)
+        command.value.response(response)

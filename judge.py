@@ -37,10 +37,6 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
         JudgeProtocol.send_command(connection, Commands.CHECK)
         logger.info(f"Runner with IP {ip} on port {port} initialized.")
 
-        # logger.info(f"Trying to retrieve the type of the runner with IP {ip} on port {port}...")
-        # protocol.send_command(client_socket, Commands.START)
-        # logger.info(f"Runner with IP {ip} on port {port} is of type ... .")
-
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")
 

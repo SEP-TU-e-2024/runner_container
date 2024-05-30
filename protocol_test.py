@@ -10,10 +10,15 @@ import runner
 
 
 def test():
+    """
+    Main test method.
+    """
     judge_thread = threading.Thread(target=judge.main)
     judge_thread.daemon = True
     judge_thread.start()
+
     sleep(2)
+
     runner_thread = threading.Thread(target=runner.main)
     runner_thread.daemon = True
     runner_thread.start()
