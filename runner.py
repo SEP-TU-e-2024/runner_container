@@ -9,7 +9,7 @@ from time import sleep
 
 from custom_logger import main_logger
 from protocol import Connection
-from protocol.runner import RunnerProtocol
+from protocol.runner import Protocol
 from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
 
 logger = main_logger.getChild("runner")
@@ -54,7 +54,7 @@ class Runner:
         Handles the incoming commands from the judge server.
         """
         while True:
-            command, args = RunnerProtocol.receive_command(self.connection)
+            command, args = Protocol.receive_command(self.connection)
             thread = threading.Thread(target=command.execute, args=(self.connection, args))
             thread.start()
             self.threads.append(thread)
