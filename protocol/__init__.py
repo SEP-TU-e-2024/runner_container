@@ -3,40 +3,11 @@ This module containes the protocol used for communication between the judge serv
 """
 
 import json
-import socket
-import threading
 
 from custom_logger import main_logger
+from protocol import Connection
 
 logger = main_logger.getChild("protocol")
-
-
-class Connection:
-    ip: str
-    """
-    The IP address of the peer.
-    """
-
-    port: int
-    """
-    The port used for the connection.
-    """
-
-    sock: socket.socket
-    """
-    The socket used for the connection.
-    """
-
-    sock_lock: threading.Lock
-    """
-    A lock used to synchronize access to the socket.
-    """
-
-    def __init__(self, ip: str, port: int, sock: socket.socket, sock_lock: threading.Lock):
-        self.ip = ip
-        self.port = port
-        self.sock = sock
-        self.sock_lock = sock_lock
 
 
 class Protocol:
@@ -76,7 +47,9 @@ class Protocol:
         data = sock.recv(4)
 
         if len(data) == 0:
-            raise ConnectionResetError(f"The connection was closed by the peer with ip {ip} on port {port}!")
+            raise ConnectionResetError(
+                f"The connection was closed by the peer with ip {ip} on port {port}!"
+            )
 
         sock.settimeout(timeout)
         data_size = int.from_bytes(data, byteorder="big")

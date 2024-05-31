@@ -2,41 +2,13 @@
 This module contains the parts of the protocol used by the runner.
 """
 
-from abc import ABC, abstractmethod
-from enum import Enum
-
 from custom_logger import main_logger
 from protocol import Connection, Protocol
 
+from .commands import Commands
+from .commands.command import Command
+
 main_logger = main_logger.getChild("protocol.runner")
-
-
-class Command(ABC):
-    """
-    Base abstract class for commands.
-    """
-
-    @staticmethod
-    @abstractmethod
-    def execute(connection: Connection, args: dict):
-        """
-        Executes the command. It is recommended to call this in a separate thread.
-        """
-        pass
-
-
-class CheckCommand(Command):
-    """
-    Command used to check the status of the runner.
-    """
-
-    @staticmethod
-    def execute(connection: Connection, args: dict):
-        Protocol.send(connection, {"status": "ok"})
-
-
-class Commands(Enum):
-    CHECK = CheckCommand()
 
 
 class RunnerProtocol(Protocol):
