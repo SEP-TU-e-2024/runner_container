@@ -55,7 +55,10 @@ class Runner:
         """
         while True:
             command, args = Protocol.receive_command(self.connection)
-            thread = threading.Thread(target=command.execute2, args=(self.connection, args))
+            thread = threading.Thread(
+                target=Protocol.handle_command, args=(self.connection, command, args)
+            )
+            thread.daemon = True
             thread.start()
             self.threads.append(thread)
 
