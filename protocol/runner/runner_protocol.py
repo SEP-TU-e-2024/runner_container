@@ -1,7 +1,8 @@
 from custom_logger import main_logger
 from protocol import Connection, Protocol
 
-from .commands import Command, Commands
+from .commands import Commands
+from .commands.command import Command
 
 logger = main_logger.getChild("protocol.runner")
 
