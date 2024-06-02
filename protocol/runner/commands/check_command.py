@@ -1,5 +1,3 @@
-from protocol import Connection, Protocol
-
 from .command import Command
 
 
@@ -9,5 +7,5 @@ class CheckCommand(Command):
     """
 
     @staticmethod
-    def execute(connection: Connection, args: dict):
-        Protocol.send(connection, {"status": "ok"})
+    def execute(args: dict):
+        return {"status": "ok"}

@@ -1,7 +1,4 @@
-from enum import Enum
+from .command import Command
+from .runner_commands import Commands
 
-from .check_command import CheckCommand
-
-
-class Commands(Enum):
-    CHECK = CheckCommand()
+__all__ = ["Command", "Commands"]

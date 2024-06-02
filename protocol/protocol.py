@@ -11,7 +11,7 @@ from .connection import Connection
 logger = main_logger.getChild("protocol")
 
 class Protocol:
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
 
     @staticmethod
     def send(connection: Connection, message: dict):
