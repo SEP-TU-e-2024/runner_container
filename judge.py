@@ -11,7 +11,7 @@ from protocol import Connection
 from protocol.judge import Commands, Protocol
 
 HOST = "localhost"
-PORT = 12345
+PORT = 12345  # Find a nicer port number
 
 runners = []
 
@@ -36,6 +36,8 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
         )
         Protocol.send_command(connection, Commands.CHECK)
         logger.info(f"Runner with IP {ip} on port {port} initialized.")
+        
+        Protocol.send_command(connection, Commands.START)
 
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")

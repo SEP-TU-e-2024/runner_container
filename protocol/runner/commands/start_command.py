@@ -1,3 +1,5 @@
+from container import Container
+
 from .command import Command
 
 
@@ -8,4 +10,6 @@ class StartCommand(Command):
 
     @staticmethod
     def execute(args: dict):
-        return {"status": "ok"}
+        container = Container()
+        container.run()
+        
