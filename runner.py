@@ -54,9 +54,9 @@ class Runner:
         Handles the incoming commands from the judge server.
         """
         while True:
-            command, args = Protocol.receive_command(self.connection)
+            command_id, command_name, command_args = Protocol.receive_command(self.connection)
             thread = threading.Thread(
-                target=Protocol.handle_command, args=(self.connection, command, args)
+                target=Protocol.handle_command, args=(self.connection,command_id, command_name, command_args)
             )
             thread.daemon = True
             thread.start()

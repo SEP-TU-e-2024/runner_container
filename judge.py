@@ -21,6 +21,12 @@ sock.bind((HOST, PORT))
 sock.listen(1000)
 
 
+def _receiver(connection: Connection, reponses: dict[str, dict]):
+    while True:
+        # Protocol.receive_command(connection)
+        pass
+
+
 def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     """
     Sends commands to the runners.
@@ -30,13 +36,20 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
 
+    # commands_sent = []
+    responses_received = []
+
+    receiver_thread = threading.Thread(target=_receiver, args=(connection, responses_received))
+    receiver_thread.daemon = True
+    receiver_thread.start()
+
     try:
         logger.info(
             f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
         )
         Protocol.send_command(connection, Commands.CHECK)
         logger.info(f"Runner with IP {ip} on port {port} initialized.")
-        
+
         Protocol.send_command(connection, Commands.START)
 
     except socket.timeout:
