@@ -10,6 +10,7 @@ from .connection import Connection
 
 logger = main_logger.getChild("protocol")
 
+
 class Protocol:
     VERSION = "0.0.2"
 

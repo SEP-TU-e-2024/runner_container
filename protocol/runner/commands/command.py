@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from protocol import Connection
-
 
 class Command(ABC):
     """
@@ -10,7 +8,7 @@ class Command(ABC):
 
     @staticmethod
     @abstractmethod
-    def execute(connection: Connection, args: dict):
+    def execute(args: dict):
         """
         Executes the command. It is recommended to call this in a separate thread.
         """

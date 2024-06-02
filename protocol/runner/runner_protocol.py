@@ -23,9 +23,14 @@ class RunnerProtocol(Protocol):
         return Commands[""], command_args
 
     @staticmethod
-    def send_response(connection: Connection, response: dict):
+    def handle_command(connection: Connection, command: Command, args: dict) -> None:
         """
-        Sends a response to the judge server.
+        Handles the incoming commands from the judge server.
         """
 
-        Protocol.send(connection, response)
+        response = command.execute(connection, args)
+
+        if response:
+            Protocol.send(connection, response["command"], response["args"])
+
+        main_logger.info(f"Sent response: {response}")
