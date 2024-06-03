@@ -3,11 +3,13 @@ This module contains code used for creating and managing the containers created 
 """
 
 import os
+from threading import Thread
 
 import docker
 from docker.types import Mount
 
 from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
+from profiler import profiler
 
 
 class Container:
@@ -54,8 +56,14 @@ class Container:
         print("Running...")
         self.container.start()
 
+        # start the profiler thread
+        thread = Thread(target = profiler, args = (self.container))
+        thread.start()
+
         for data in self.container.logs(stream=True):
             print(f"{data.decode()}", end="")
+        
+        thread.join()
 
 
 # ----------------------------------------------------------------
