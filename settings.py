@@ -22,6 +22,7 @@ Time in seconds to wait before retrying to connect to the judge server.
 # ----------------------------------------------------------------
 DOCKER_FILE_PARRENT_DIR = "."  # just for testing
 # DOCKER_IMAGE = "runnercontainer"
+DOCKER_TIMEOUT = 10
 
 # Mounts
 DOCKER_SUBMISSION = "/submission"
