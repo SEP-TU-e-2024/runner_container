@@ -8,8 +8,11 @@ from threading import Thread
 import docker
 from docker.types import Mount
 
+from custom_logger import main_logger
 from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
 from profiler import profiler
+
+logger = main_logger.getChild("container")
 
 
 class Container:
@@ -18,18 +21,19 @@ class Container:
         self.docker_image, _ = self.docker_client.images.build(
             path=DOCKER_FILE_PARRENT_DIR
         )  # this is temp, for testing its easier to just build the image every time
-        print("Done building image")
+        
+        logger.info("Done building image")
 
         self._config_mounts()
         self.container = self.docker_client.containers.create(
             image=self.docker_image, mounts=self.mounts, detach=True
         )
-        # self.container = self.docker_client.containers.create(image=DOCKER_IMAGE, mounts=self.mounts, detach=True)
 
     def _config_mounts(self):
         """
         Configures the mounts for the container.
         """
+        
         cwd = os.getcwd()
         self.mounts = [
             Mount(
@@ -53,7 +57,7 @@ class Container:
         """
         Run the container.
         """
-        print("Running...")
+        logger.info("Running...")
         self.container.start()
 
         # start the profiler thread

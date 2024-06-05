@@ -8,12 +8,11 @@ import threading
 
 from custom_logger import main_logger
 from protocol import Connection
-from protocol.judge import Commands, JudgeProtocol
+from protocol.judge import Commands, Protocol
+from settings import JUDGE_PORT
 
-HOST = "localhost"
-PORT = 12345
-
-runners = []
+HOST = "localhost"  # Replace with local IP of the judge machine
+PORT = JUDGE_PORT  # Find a nicer port number
 
 logger = main_logger.getChild("judge")
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,13 +28,27 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     ip, port = addr
     connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
+    protocol = Protocol(connection)
 
     try:
-        logger.info(
-            f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
-        )
-        JudgeProtocol.send_command(connection, Commands.CHECK)
-        logger.info(f"Runner with IP {ip} on port {port} initialized.")
+        # The first command is the first command that should be sent. It tests if the runner is connected correctly.
+        protocol.send_command(Commands.CHECK, block=True)
+
+        # Test multiple commands running at the same time
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+
+        # TODO: Run until the runner or the judge closes the connection
+        while True:
+            pass
 
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")
@@ -60,7 +73,7 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
 
 def main():
     """
-    The main function.
+    The main function of the test judge.
     """
     logger.info(f"Judge server started on {HOST}:{PORT}.")
 
@@ -79,5 +92,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Shutting down the judge server...")
         sock.shutdown(socket.SHUT_RDWR)
+        print(1234)
         sock.close()
         exit(0)
