@@ -1,5 +1,5 @@
 """
-Module that contains the CheckCommand class.
+This module contains the CheckCommand class.
 """
 
 from .command import Command

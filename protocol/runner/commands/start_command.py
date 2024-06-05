@@ -1,3 +1,7 @@
+"""
+This module contains the StartCommand class.
+"""
+
 from container import Container
 
 from .command import Command
@@ -13,4 +17,3 @@ class StartCommand(Command):
         container = Container()
         container.run()
         return {"status": "ok"}
-        

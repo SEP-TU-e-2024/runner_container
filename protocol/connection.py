@@ -1,8 +1,16 @@
+"""
+This module contains the Connection class.
+"""
+
 import socket
 import threading
 
 
 class Connection:
+    """
+    The Connection class is used to store and group information about a connection to a peer.
+    """
+
     ip: str
     """
     The IP address of the peer.

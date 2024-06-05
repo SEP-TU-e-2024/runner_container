@@ -1,3 +1,7 @@
+"""
+This module contains the Command class.
+"""
+
 from abc import ABC, abstractmethod
 
 
