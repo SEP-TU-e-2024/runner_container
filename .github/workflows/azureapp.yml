@@ -47,5 +47,5 @@ jobs:
             --version-name $TAG_NAME \
             --location ${{ vars.AZURE_LOCATION }} \
             --package-file-link "https://${{ vars.AZURE_APP_STORAGE }}.blob.core.windows.net/${{ vars.AZURE_APP_STORAGE_CONTAINER }}/app-$TAG_NAME.zip" \
-            --install-command "apt-get install -y unzip && unzip -d judge_runner -o app-$TAG_NAME.zip && cd judge_runner && chmod +x azure/install.sh && ./azure/install.sh" \
+            --install-command "sleep 20 && apt-get install -y unzip && unzip -d judge_runner -o app-$TAG_NAME.zip && cd judge_runner && chmod +x azure/install.sh && ./azure/install.sh" \
             --remove-command "chmod +x judge_runner/azure/uninstall.sh && ./judge_runner/azure/uninstall.sh"
