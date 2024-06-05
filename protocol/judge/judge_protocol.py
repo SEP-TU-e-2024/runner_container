@@ -1,3 +1,7 @@
+"""
+This module contains the JudgeProtocol class.
+"""
+
 import threading
 import uuid
 from queue import Queue
@@ -11,6 +15,10 @@ logger = main_logger.getChild("protocol.judge")
 
 
 class JudgeProtocol(Protocol):
+    """
+    The protocol class used by the judge server.
+    """
+
     def __init__(self, connection: Connection):
         self.connection = connection
         self.queue_dict_lock = threading.Lock()
@@ -20,6 +28,10 @@ class JudgeProtocol(Protocol):
         self.receiver_thread.start()
 
     def _receiver(self):
+        """
+        Receives and handles responses from the runner.
+        """
+
         while True:
             message_id, response = self._receive_response()
 
@@ -30,15 +42,20 @@ class JudgeProtocol(Protocol):
         """
         Sends a given command with the given arguemtents to the runner specifed in the connection.
         """
+
         if block:
             self._send_command(command, **kwargs)
             return
-        
+
         threading.Thread(
             target=self._send_command, args=(command,), kwargs=kwargs, daemon=True
         ).start()
 
     def _send_command(self, command: Commands, **kwargs):
+        """
+        Send command to the runner and wait for the response.
+        """
+        
         message = {"id": uuid.uuid4().hex, "command": command.name, "args": kwargs}
 
         queue = Queue()
