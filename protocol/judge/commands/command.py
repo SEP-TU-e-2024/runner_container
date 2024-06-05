@@ -9,4 +9,7 @@ class Command(ABC):
     @staticmethod
     @abstractmethod
     def response(response: dict):
+        """
+        Handles the response from the runner.
+        """
         pass

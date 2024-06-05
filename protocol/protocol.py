@@ -17,8 +17,9 @@ class Protocol:
     @staticmethod
     def send(connection: Connection, message: dict):
         """
-        Sends a json message.
+        Sends a JSON message. This function is thread-safe and locks the socket mutex.
         """
+
         ip = connection.ip
         port = connection.port
         sock = connection.sock
@@ -39,8 +40,9 @@ class Protocol:
     @staticmethod
     def receive(connection: Connection, timeout: int | None = None) -> dict:
         """
-        Receive a json message.
+        Receives a JSON message.
         """
+
         sock = connection.sock
         ip = connection.ip
         port = connection.port

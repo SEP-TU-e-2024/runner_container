@@ -55,7 +55,7 @@ class JudgeProtocol(Protocol):
         """
         Send command to the runner and wait for the response.
         """
-        
+
         message = {"id": uuid.uuid4().hex, "command": command.name, "args": kwargs}
 
         queue = Queue()
