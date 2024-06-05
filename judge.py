@@ -37,9 +37,9 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     disconnected = False
 
     # commands_sent = []
-    responses_received = []
+    # responses_received = []
 
-    receiver_thread = threading.Thread(target=_receiver, args=(connection, responses_received))
+    receiver_thread = threading.Thread(target=_receiver, args=(connection))
     receiver_thread.daemon = True
     receiver_thread.start()
 
