@@ -9,11 +9,10 @@ import threading
 from custom_logger import main_logger
 from protocol import Connection
 from protocol.judge import Commands, Protocol
+from settings import JUDGE_PORT
 
 HOST = "localhost"  # Replace with local IP of the judge machine
-PORT = 12345  # Find a nicer port number
-
-runners = []
+PORT = JUDGE_PORT  # Find a nicer port number
 
 logger = main_logger.getChild("judge")
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
