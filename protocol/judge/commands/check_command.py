@@ -3,11 +3,7 @@ from .command import Command
 
 class CheckCommand(Command):
     @staticmethod
-    def response(message: dict):
-        if message["response"] is None:
-            raise ValueError("Received message with missing response!")
-
-        response = message["response"]
+    def response(response: dict):
 
         if response["status"] is None:
             raise ValueError("Received message with missing status!")

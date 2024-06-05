@@ -21,10 +21,10 @@ sock.bind((HOST, PORT))
 sock.listen(1000)
 
 
-def _receiver(connection: Connection, reponses: dict[str, dict]):
-    while True:
-        # Protocol.receive_command(connection)
-        pass
+# def _receiver(connection: Connection, queue_dict: dict[str, Queue[dict]]):
+#     while True:
+#         message_id, response = Protocol.receive_response(connection)
+#         queue_dict[message_id].put(response)
 
 
 def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
@@ -35,22 +35,25 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     ip, port = addr
     connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
+    protocol = Protocol(connection)
 
-    # commands_sent = []
-    # responses_received = []
+    # queue_dict = dict[str, Queue[dict]]
 
-    receiver_thread = threading.Thread(target=_receiver, args=(connection))
-    receiver_thread.daemon = True
-    receiver_thread.start()
+    # receiver_thread = threading.Thread(target=_receiver, args=(connection, queue_dict))
+    # receiver_thread.daemon = True
+    # receiver_thread.start()
 
     try:
-        logger.info(
-            f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
-        )
-        Protocol.send_command(connection, Commands.CHECK)
-        logger.info(f"Runner with IP {ip} on port {port} initialized.")
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.START)
+        # logger.info(
+        #     f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
+        # )
+        # Protocol.send_command(connection, Commands.CHECK)
+        # logger.info(f"Runner with IP {ip} on port {port} initialized.")
 
-        Protocol.send_command(connection, Commands.START)
+        # Protocol.send_command(connection, Commands.START)
+        pass
 
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")

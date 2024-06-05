@@ -8,5 +8,5 @@ class Command(ABC):
 
     @staticmethod
     @abstractmethod
-    def response(message: dict):
+    def response(response: dict):
         pass

@@ -33,7 +33,7 @@ class RunnerProtocol(Protocol):
         """
         command = Commands[command_name].value
         response = command.execute(args)
-        message = {"id": command_id, "command": command_name, "response": response}
+        message = {"id": command_id, "response": response}
         Protocol.send(connection, message)
 
         main_logger.info(f"Sent response: {response}")

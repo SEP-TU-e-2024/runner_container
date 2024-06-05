@@ -3,6 +3,6 @@ from .command import Command
 
 class StartCommand(Command):
     @staticmethod
-    def response(message: dict):
+    def response(response: dict):
         pass
 
