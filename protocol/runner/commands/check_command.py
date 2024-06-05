@@ -1,3 +1,7 @@
+"""
+Module that contains the CheckCommand class.
+"""
+
 from .command import Command
 
 

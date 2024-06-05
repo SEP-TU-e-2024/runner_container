@@ -10,7 +10,7 @@ from custom_logger import main_logger
 from protocol import Connection
 from protocol.judge import Commands, Protocol
 
-HOST = "localhost"
+HOST = "localhost"  # Replace with local IP of the judge machine
 PORT = 12345  # Find a nicer port number
 
 runners = []
@@ -19,12 +19,6 @@ logger = main_logger.getChild("judge")
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind((HOST, PORT))
 sock.listen(1000)
-
-
-# def _receiver(connection: Connection, queue_dict: dict[str, Queue[dict]]):
-#     while True:
-#         message_id, response = Protocol.receive_response(connection)
-#         queue_dict[message_id].put(response)
 
 
 def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
@@ -37,15 +31,10 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     disconnected = False
     protocol = Protocol(connection)
 
-    # queue_dict = dict[str, Queue[dict]]
-
-    # receiver_thread = threading.Thread(target=_receiver, args=(connection, queue_dict))
-    # receiver_thread.daemon = True
-    # receiver_thread.start()
-
     try:
         logger.info(f"Sending CHECK command to the runner with IP {ip} on port {port}...")
         protocol.send_command(Commands.CHECK, block=True)
+
         logger.info(f"Sending START command to the runner with IP {ip} on port {port}...")
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)
@@ -57,18 +46,11 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)
-        
-        
+
+        # TODO: Run until the runner or the judge closes the connection
         while True:
             pass
-        # logger.info(
-        #     f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
-        # )
-        # Protocol.send_command(connection, Commands.CHECK)
-        # logger.info(f"Runner with IP {ip} on port {port} initialized.")
 
-        # Protocol.send_command(connection, Commands.START)
-        
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")
 
@@ -92,7 +74,7 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
 
 def main():
     """
-    The main function.
+    The main function of the test judge.
     """
     logger.info(f"Judge server started on {HOST}:{PORT}.")
 

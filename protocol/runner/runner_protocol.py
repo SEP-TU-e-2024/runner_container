@@ -31,6 +31,7 @@ class RunnerProtocol(Protocol):
         """
         Handles the incoming commands from the judge server.
         """
+
         command = Commands[command_name].value
         response = command.execute(args)
         message = {"id": command_id, "response": response}

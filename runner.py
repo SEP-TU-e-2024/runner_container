@@ -32,6 +32,7 @@ class Runner:
         """
         Starts the connection to the judge server. In case of a unexpected disconnection, it retries to connect.
         """
+
         logger.info(f"Trying to connect to the Judge server at {self.ip}:{self.port} ...")
 
         while True:
@@ -53,6 +54,7 @@ class Runner:
         """
         Handles the incoming commands from the judge server.
         """
+
         while True:
             command_id, command_name, command_args = Protocol.receive_command(self.connection)
             thread = threading.Thread(
@@ -65,8 +67,9 @@ class Runner:
 
     def stop(self):
         """
-        Closes the connection to the judge server.
+        Closes the connection to the judge server. Not used currently.
         """
+
         for thread in self.threads:
             thread.join(1)
             self.threads.clear()
@@ -81,6 +84,7 @@ def main():
     """
     The main function of the runner server.
     """
+
     runner = Runner(JUDGE_HOST, JUDGE_PORT)
     try:
         runner.start()
