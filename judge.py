@@ -44,8 +44,23 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     # receiver_thread.start()
 
     try:
+        logger.info(f"Sending CHECK command to the runner with IP {ip} on port {port}...")
+        protocol.send_command(Commands.CHECK, block=True)
+        logger.info(f"Sending START command to the runner with IP {ip} on port {port}...")
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.START)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+        protocol.send_command(Commands.CHECK)
+        
+        
+        while True:
+            pass
         # logger.info(
         #     f"Checking if the runner with IP {ip} on port {port} is initialized correctly..."
         # )
@@ -53,8 +68,7 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
         # logger.info(f"Runner with IP {ip} on port {port} initialized.")
 
         # Protocol.send_command(connection, Commands.START)
-        pass
-
+        
     except socket.timeout:
         logger.error(f"Runner with IP {ip} on port {port} timed out.")
 
@@ -97,5 +111,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Shutting down the judge server...")
         sock.shutdown(socket.SHUT_RDWR)
+        print(1234)
         sock.close()
         exit(0)

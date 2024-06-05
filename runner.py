@@ -43,7 +43,7 @@ class Runner:
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
                 self.connection = None
-                logger.info(f"{e}. Failed to connect to judge server. Retrying in 5 seconds...")
+                logger.info(f"{e}.Failed to connect to judge server. Retrying in 5 seconds...")
                 sleep(RETRY_WAIT)
 
             finally:
@@ -56,7 +56,8 @@ class Runner:
         while True:
             command_id, command_name, command_args = Protocol.receive_command(self.connection)
             thread = threading.Thread(
-                target=Protocol.handle_command, args=(self.connection,command_id, command_name, command_args)
+                target=Protocol.handle_command,
+                args=(self.connection, command_id, command_name, command_args),
             )
             thread.daemon = True
             thread.start()

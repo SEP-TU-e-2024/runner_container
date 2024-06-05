@@ -22,8 +22,13 @@ def test():
     runner_thread = threading.Thread(target=runner.main)
     runner_thread.daemon = True
     runner_thread.start()
+    
+    runner_thread2 = threading.Thread(target=runner.main)
+    runner_thread2.daemon = True
+    runner_thread2.start()
 
     runner_thread.join()
+    runner_thread2.join()
     judge_thread.join()
 
 

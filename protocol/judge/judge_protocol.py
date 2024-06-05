@@ -22,14 +22,18 @@ class JudgeProtocol(Protocol):
     def _receiver(self):
         while True:
             message_id, response = self._receive_response()
+
             with self.queue_dict_lock:
                 self.queue_dict[message_id].put(response)
 
-    def send_command(self, command: Commands, **kwargs):
+    def send_command(self, command: Commands, block: bool = False, **kwargs):
         """
         Sends a given command with the given arguemtents to the runner specifed in the connection.
         """
-
+        if block:
+            self._send_command(command, **kwargs)
+            return
+        
         threading.Thread(
             target=self._send_command, args=(command,), kwargs=kwargs, daemon=True
         ).start()
@@ -41,6 +45,7 @@ class JudgeProtocol(Protocol):
         with self.queue_dict_lock:
             self.queue_dict[message["id"]] = queue
 
+        self.send(self.connection, message)
         response = queue.get()
 
         command.value.response(response)
