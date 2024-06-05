@@ -12,5 +12,5 @@ class StartCommand(Command):
     def execute(args: dict):
         container = Container()
         container.run()
-        return {"done"}
+        return {"status": "ok"}
         
