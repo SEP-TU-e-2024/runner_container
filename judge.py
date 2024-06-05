@@ -31,10 +31,10 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     protocol = Protocol(connection)
 
     try:
-        logger.info(f"Sending CHECK command to the runner with IP {ip} on port {port}...")
+        # The first command is the first command that should be sent. It tests if the runner is connected correctly.
         protocol.send_command(Commands.CHECK, block=True)
 
-        logger.info(f"Sending START command to the runner with IP {ip} on port {port}...")
+        # Test multiple commands running at the same time
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)
         protocol.send_command(Commands.CHECK)

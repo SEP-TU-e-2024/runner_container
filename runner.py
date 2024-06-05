@@ -19,7 +19,6 @@ class Runner:
     ip: str
     port: int
     debug: bool
-    connection: Connection
     threads: list[threading.Thread]
 
     def __init__(self, ip, port, debug=False):
@@ -40,6 +39,7 @@ class Runner:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.ip, self.port))
                 self.connection = Connection(self.ip, self.port, sock, threading.Lock())
+                self.protocol = Protocol(self.connection)
                 self._handle_commands()
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
@@ -56,10 +56,10 @@ class Runner:
         """
 
         while True:
-            command_id, command_name, command_args = Protocol.receive_command(self.connection)
+            command_id, command_name, command_args = self.protocol.receive_command()
             thread = threading.Thread(
-                target=Protocol.handle_command,
-                args=(self.connection, command_id, command_name, command_args),
+                target=self.protocol.handle_command,
+                args=(command_id, command_name, command_args),
             )
             thread.daemon = True
             thread.start()
