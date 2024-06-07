@@ -61,7 +61,7 @@ class JudgeProtocol(Protocol):
         with self.queue_dict_lock:
             self.queue_dict[message["id"]] = queue
 
-        self.send(self.connection, message)
+        Protocol.send(self.connection, message)
         response = queue.get()
 
         command.value.response(response)

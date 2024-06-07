@@ -60,8 +60,8 @@ class Runner:
             thread = threading.Thread(
                 target=self.protocol.handle_command,
                 args=(command_id, command_name, command_args),
+                daemon=True,
             )
-            thread.daemon = True
             thread.start()
             self.threads.append(thread)
 

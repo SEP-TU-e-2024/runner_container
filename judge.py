@@ -81,8 +81,7 @@ def main():
         client_socket, addr = sock.accept()
 
         logger.info(f"Incoming connection from {addr[0]} on port {addr[1]}.")
-        thread = threading.Thread(target=_handle_connections, args=(client_socket, addr))
-        thread.daemon = True
+        thread = threading.Thread(target=_handle_connections, args=(client_socket, addr), daemon=True)
         thread.start()
 
 
