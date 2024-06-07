@@ -35,7 +35,7 @@ class Connection:
 
     message_counter: Counter
     """
-    
+    A counter used to generate unique message IDs.
     """
 
     def __init__(
