@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import sys
+
+np.set_printoptions(threshold=sys.maxsize)
 
 # return a matrix
 def process_file(file):
