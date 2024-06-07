@@ -15,7 +15,7 @@ class RunnerProtocol(Protocol):
     """
     The protocol class used by the runners.
     """
-    
+
     connection: Connection
 
     def __init__(self, connection: Connection):
@@ -41,9 +41,19 @@ class RunnerProtocol(Protocol):
         Handles the incoming commands from the judge server.
         """
 
-        command = Commands[command_name].value
-        response = command.execute(args)
-        message = {"id": command_id, "response": response}
-        Protocol.send(self.connection, message)
+        try:
+            command = Commands[command_name].value
+            response = command.execute(args)
+            message = {"id": command_id, "response": response}
+            Protocol.send(self.connection, message)
 
-        main_logger.info(f"Sent response: {response}")
+            main_logger.info(f"Sent response: {response}")
+
+        except KeyError:
+            main_logger.error(f"Received unknown command: {command_name}")
+        except Exception as e:
+            if e is ConnectionResetError or e is ConnectionAbortedError:
+                raise e
+            main_logger.error(
+                f"An unexpected error has occured while trying to execute command {command_name}! ({e})"
+            )
