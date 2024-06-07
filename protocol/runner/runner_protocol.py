@@ -36,21 +36,22 @@ class RunnerProtocol(Protocol):
 
         return command_id, command_name, command_args
 
-    def handle_command(self, command_id: str, command_name: str, args: dict) -> None:
+    def handle_command(self, command_id: str, command_name: str, args: dict):
         """
         Handles the incoming commands from the judge server.
         """
 
         try:
+            if command_name not in Commands:
+                main_logger.error(f"Received unknown command: {command_name}")
+                return
+
             command = Commands[command_name].value
             response = command.execute(args)
             message = {"id": command_id, "response": response}
             Protocol.send(self.connection, message)
 
             main_logger.info(f"Sent response: {response}")
-
-        except KeyError:
-            main_logger.error(f"Received unknown command: {command_name}")
 
         except Exception as e:
             if e is ConnectionResetError or e is ConnectionAbortedError:
