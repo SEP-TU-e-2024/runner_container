@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run the profiler in the background
-profiler.sh &
+/app/profiler.sh &
 
 # make a directory for the running environement
 mkdir runenv
