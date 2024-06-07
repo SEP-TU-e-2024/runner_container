@@ -71,8 +71,8 @@ class Runner:
         """
 
         for thread in self.threads:
-            thread.join(1)
-            self.threads.clear()
+            thread.join()
+        self.threads.clear()
         if self.connection is not None:
             sock = self.connection.sock
             sock.shutdown(socket.SHUT_RDWR)
