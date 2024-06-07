@@ -1,3 +1,4 @@
+list -all settings
 create -languages Python C++ web src_db.und
 add *.py
 add validator/
