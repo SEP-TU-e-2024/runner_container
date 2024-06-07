@@ -11,8 +11,8 @@ WORKDIR /
 
 COPY start.sh start.sh
 RUN chmod +x start.sh
-COPY profiler.sh profiler.sh
-RUN chmod +x profiler.sh
+COPY profiler.sh /app/profiler.sh
+RUN chmod +x /app/profiler.sh
 
 CMD ./start.sh
 
