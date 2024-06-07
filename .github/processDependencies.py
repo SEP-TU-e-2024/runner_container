@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-# TODO remove
-np.set_printoptions(threshold=999999, linewidth=999999, edgeitems=999999)
-
 # return a matrix
 def process_file(file):
     df = pd.read_csv(file)
@@ -12,7 +9,11 @@ def process_file(file):
     df = df.drop([index for index, row in df.iterrows() if row['Dependent File'] not in cols])
     df = df[[col for col in df.columns if (col == df["Dependent File"]).any()]].dropna(how='all')
 
-    print('\nCyclic dependencies:\n', df)
+    # TODO remove
+    np.set_printoptions(threshold=999999, linewidth=999999, edgeitems=999999)
+
+    print('\nCyclic dependencies:')
+    print(df)
 
     return np.nan_to_num(df.to_numpy(), nan=0), list(df.columns)
 
