@@ -64,8 +64,9 @@ class JudgeProtocol(Protocol):
         """
         Send command to the runner and wait for the response.
         """
+        
         try:
-            counter = self.connection.counter
+            counter = self.connection.message_counter
             message = {"id": counter.generate(), "command": command.name, "args": kwargs}
 
             queue = Queue()

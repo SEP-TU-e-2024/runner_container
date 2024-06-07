@@ -33,7 +33,7 @@ class Connection:
     A lock used to synchronize access to the socket.
     """
 
-    counter: Counter
+    message_counter: Counter
     """
     
     """
@@ -51,4 +51,4 @@ class Connection:
         sock.settimeout(timeout)
         self.sock = sock
         self.sock_lock = sock_lock
-        self.counter = Counter()
+        self.message_counter = Counter()
