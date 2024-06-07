@@ -6,5 +6,5 @@ settings -metricsOutputFile metrics.csv
 settings -MetricsFileNameDisplayMode RelativePath
 settings -ReportFileNameDisplayMode full
 analyze
-export -dependencies file matrix matrix.csv
+export -dependencies -format long file matrix matrix.csv
 metrics
