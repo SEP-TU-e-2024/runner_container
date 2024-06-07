@@ -3,14 +3,11 @@ This module contains code used for creating and managing the containers created 
 """
 
 import os
-from threading import Thread
-
 import docker
 from docker.types import Mount
 
 from custom_logger import main_logger
-from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
-from profiler import profiler
+from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_TIMEOUT
 
 logger = main_logger.getChild("container")
 
@@ -29,6 +26,18 @@ class Container:
             image=self.docker_image, mounts=self.mounts, detach=True
         )
 
+    def _profiler(self):
+    #open the file to write the stats
+
+        while self.container.status == "running":
+
+            start_time = time()
+            if time() - start_time > DOCKER_TIMEOUT:
+                self.container.stop()
+                break
+
+
+        
     def _config_mounts(self):
         """
         Configures the mounts for the container.
@@ -61,14 +70,13 @@ class Container:
         self.container.start()
 
         # start the profiler thread
-        thread = Thread(target = profiler, args = (self.container))
-        thread.start()
+        # thread = Thread(target = self._profiler)
+        # thread.start()
 
         for data in self.container.logs(stream=True):
             print(f"{data.decode()}", end="")
         
-        thread.join()
-
+        # thread.join()
 
 # ----------------------------------------------------------------
 # TESTING
