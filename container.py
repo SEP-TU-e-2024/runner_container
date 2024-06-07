@@ -26,19 +26,7 @@ class Container:
         self.container = self.docker_client.containers.create(
             image=self.docker_image, mounts=self.mounts, detach=True
         )
-
-    def _profiler(self):
-    #open the file to write the stats
-
-        while self.container.status == "running":
-
-            start_time = time()
-            if time() - start_time > DOCKER_TIMEOUT:
-                self.container.stop()
-                break
-
-
-        
+   
     def _config_mounts(self):
         """
         Configures the mounts for the container.
