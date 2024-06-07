@@ -9,7 +9,7 @@ from .command import Command
 
 class StartCommand(Command):
     """
-    Command used to check the status of the runner.
+    The StartCommand class is used to start a container on the runner.
     """
 
     @staticmethod
