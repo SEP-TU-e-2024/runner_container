@@ -69,7 +69,7 @@ class Runner:
 
     def stop(self):
         """
-        Closes the connection to the judge server. Not used currently.
+        Closes the connection to the judge server.
         """
 
         for thread in self.threads:

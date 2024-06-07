@@ -8,7 +8,13 @@ import docker
 from docker.types import Mount
 
 from custom_logger import main_logger
-from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
+from settings import (
+    DOCKER_BASE,
+    DOCKER_FILE_PARRENT_DIR,
+    DOCKER_RESULTS,
+    DOCKER_SUBMISSION,
+    DOCKER_VALIDATOR,
+)
 
 logger = main_logger.getChild("container")
 
@@ -26,7 +32,7 @@ class Container:
         self.container = self.docker_client.containers.create(
             image=self.docker_image, mounts=self.mounts, detach=True
         )
-   
+
     def _config_mounts(self):
         """
         Configures the mounts for the container.
@@ -35,13 +41,13 @@ class Container:
         cwd = os.getcwd()
         self.mounts = [
             Mount(
-                target=DOCKER_SUBMISSION,
+                target=f"{DOCKER_BASE}{DOCKER_SUBMISSION}",
                 source=f"{cwd}{DOCKER_SUBMISSION}",
                 type="bind",
                 read_only=True,
             ),
             Mount(
-                target=DOCKER_VALIDATOR,
+                target=f"{DOCKER_BASE}{DOCKER_VALIDATOR}",
                 source=f"{cwd}{DOCKER_VALIDATOR}",
                 type="bind",
                 read_only=True,
@@ -58,12 +64,9 @@ class Container:
         logger.info("Running...")
         self.container.start()
 
-        # start the profiler thread
-        # thread = Thread(target = self._profiler)
-        # thread.start()
-
         for data in self.container.logs(stream=True):
             logger.debug(f"{data.decode()}")
+
 
 # ----------------------------------------------------------------
 # TESTING

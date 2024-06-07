@@ -25,10 +25,9 @@ Time in seconds to wait before retrying to connect to the judge server.
 # Docker
 # ----------------------------------------------------------------
 DOCKER_FILE_PARRENT_DIR = "."  # just for testing
-# DOCKER_IMAGE = "runnercontainer"
-DOCKER_TIMEOUT = 10
 
 # Mounts
+DOCKER_BASE = "/app"
 DOCKER_SUBMISSION = "/submission"
 DOCKER_VALIDATOR = "/validator"
 DOCKER_RESULTS = "/results"

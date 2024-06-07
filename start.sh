@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # run the profiler in the background
+profiler.sh &
 
 # make a directory for the running environement
 mkdir runenv
@@ -10,12 +11,11 @@ pip install -r submission/requirements.txt
 pip install -r validator/requirements.txt
 
 # copy the submission and validator code to the running environment
-cp -r submission/** /runenv
-cp -r validator/** /runenv
+cp -r submission/** ./runenv
+cp -r validator/** ./runenv
 
 # change to the running environment
 cd runenv
 
-/app/profiler.sh &
 # run the main code
 python main.py
