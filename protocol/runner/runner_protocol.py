@@ -57,5 +57,5 @@ class RunnerProtocol(Protocol):
                 raise e
 
             main_logger.error(
-                f"An unexpected error has occured while trying to execute command {command_name}! ({e})"
+                f"An unexpected error has occured while trying to execute command {command_name}!", exc_info=1
             )
