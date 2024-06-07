@@ -64,7 +64,7 @@ class JudgeProtocol(Protocol):
         """
         Send command to the runner and wait for the response.
         """
-        
+
         try:
             counter = self.connection.message_counter
             message = {"id": counter.generate(), "command": command.name, "args": kwargs}
@@ -83,7 +83,8 @@ class JudgeProtocol(Protocol):
 
         except Exception:
             logger.error(
-                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}.", exc_info=1
+                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}.",
+                exc_info=1,
             )
 
         finally:
