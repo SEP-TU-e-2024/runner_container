@@ -81,9 +81,9 @@ class JudgeProtocol(Protocol):
 
             command.value.response(response)
 
-        except Exception as e:
+        except Exception:
             logger.error(
-                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}. ({e})"
+                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}.", exc_info=1
             )
 
         finally:
