@@ -40,6 +40,11 @@ class JudgeProtocol(Protocol):
             message_id, response = self._receive_response()
 
             with self.queue_dict_lock:
+                if message_id not in self.queue_dict:
+                    logger.error(
+                        f"Received response from {self.connection.ip}:{self.connection.port} with unknown message id: {message_id}"
+                    )
+                    continue
                 self.queue_dict[message_id].put(response)
 
     def send_command(self, command: Commands, block: bool = False, **kwargs):
@@ -59,20 +64,30 @@ class JudgeProtocol(Protocol):
         """
         Send command to the runner and wait for the response.
         """
-        counter = self.connection.counter
-        message = {"id": counter.generate(), "command": command.name, "args": kwargs}
+        try:
+            counter = self.connection.counter
+            message = {"id": counter.generate(), "command": command.name, "args": kwargs}
 
-        queue = Queue()
-        with self.queue_dict_lock:
-            self.queue_dict[message["id"]] = queue
+            queue = Queue()
+            with self.queue_dict_lock:
+                self.queue_dict[message["id"]] = queue
 
-        Protocol.send(self.connection, message)
-        response = queue.get()
+            Protocol.send(self.connection, message)
+            logger.info(
+                f"Sent command {command.name} with args {kwargs} to the runner located at {self.connection.ip}:{self.connection.port}."
+            )
+            response = queue.get()
 
-        command.value.response(response)
+            command.value.response(response)
 
-        with self.queue_dict_lock:
-            del self.queue_dict[message["id"]]
+        except Exception as e:
+            logger.error(
+                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}. ({e})"
+            )
+
+        finally:
+            with self.queue_dict_lock:
+                del self.queue_dict[message["id"]]
 
     def _receive_response(self) -> tuple[str, dict]:
         """
