@@ -19,8 +19,9 @@ class Runner:
     ip: str
     port: int
     debug: bool
-    connection: Connection
     threads: list[threading.Thread]
+    connection: Connection
+    protocol: RunnerProtocol
 
     def __init__(self, ip, port, debug=False):
         self.ip = ip
@@ -32,6 +33,7 @@ class Runner:
         """
         Starts the connection to the judge server. In case of a unexpected disconnection, it retries to connect.
         """
+
         logger.info(f"Trying to connect to the Judge server at {self.ip}:{self.port} ...")
 
         while True:
@@ -39,11 +41,12 @@ class Runner:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.ip, self.port))
                 self.connection = Connection(self.ip, self.port, sock, threading.Lock())
+                self.protocol = RunnerProtocol(self.connection)
                 self._handle_commands()
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
                 self.connection = None
-                logger.info(f"{e}. Failed to connect to judge server. Retrying in 5 seconds...")
+                logger.info(f"Failed to connect to judge server. Retrying in 5 seconds... ({e})")
                 sleep(RETRY_WAIT)
 
             finally:
@@ -53,9 +56,14 @@ class Runner:
         """
         Handles the incoming commands from the judge server.
         """
+
         while True:
-            command, args = RunnerProtocol.receive_command(self.connection)
-            thread = threading.Thread(target=command.execute, args=(self.connection, args))
+            command_id, command_name, command_args = self.protocol.receive_command()
+            thread = threading.Thread(
+                target=self.protocol.handle_command,
+                args=(command_id, command_name, command_args),
+                daemon=True,
+            )
             thread.start()
             self.threads.append(thread)
 
@@ -63,9 +71,10 @@ class Runner:
         """
         Closes the connection to the judge server.
         """
+
         for thread in self.threads:
-            thread.join(1)
-            self.threads.clear()
+            thread.join()
+        self.threads.clear()
         if self.connection is not None:
             sock = self.connection.sock
             sock.shutdown(socket.SHUT_RDWR)
@@ -77,6 +86,7 @@ def main():
     """
     The main function of the runner server.
     """
+
     runner = Runner(JUDGE_HOST, JUDGE_PORT)
     try:
         runner.start()

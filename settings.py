@@ -1,3 +1,7 @@
+"""
+This module contains the settings for the runner.
+"""
+
 # ----------------------------------------------------------------
 # Connection
 # ----------------------------------------------------------------
@@ -21,7 +25,6 @@ Time in seconds to wait before retrying to connect to the judge server.
 # Docker
 # ----------------------------------------------------------------
 DOCKER_FILE_PARRENT_DIR = "."  # just for testing
-# DOCKER_IMAGE = "runnercontainer"
 
 # Mounts
 DOCKER_SUBMISSION = "/submission"
