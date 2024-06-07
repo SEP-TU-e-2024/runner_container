@@ -1,11 +1,10 @@
 FROM python:3
 
 # add basic dependencies
-RUN sudo apt-get update
-RUN sudo apt-get install -y mpstat
-#FROM debian
+RUN apt-get update
+RUN apt-get install -y sysstat
+# this is for mpstat
 
-# install basic dependencies at creation time
 #RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv 
 
 WORKDIR /

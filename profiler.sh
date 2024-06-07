@@ -1,6 +1,6 @@
 #!/bin/bash
 
-output_file="results/metrics.csv"
+output_file="/results/metrics.csv"
 
 # remove the file if it exists and create it
 rm $output_file
