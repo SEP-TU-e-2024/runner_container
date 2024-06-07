@@ -9,7 +9,7 @@ from time import sleep
 
 from custom_logger import main_logger
 from protocol import Connection
-from protocol.runner import Protocol
+from protocol.runner import RunnerProtocol
 from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
 
 logger = main_logger.getChild("runner")
