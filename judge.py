@@ -92,6 +92,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Shutting down the judge server...")
         sock.shutdown(socket.SHUT_RDWR)
-        print(1234)
         sock.close()
         exit(0)
