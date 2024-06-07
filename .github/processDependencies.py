@@ -12,7 +12,7 @@ def process_file(file):
     # TODO remove
     np.set_printoptions(threshold=999999, linewidth=999999, edgeitems=999999)
 
-    print('\nCyclic dependencies:')
+    print('\nCyclic dependencies abc:')
     print(df)
 
     return np.nan_to_num(df.to_numpy(), nan=0), list(df.columns)
