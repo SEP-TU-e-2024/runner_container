@@ -9,7 +9,7 @@ from time import sleep
 
 from custom_logger import main_logger
 from protocol import Connection
-from protocol.runner import Protocol
+from protocol.runner import RunnerProtocol
 from settings import JUDGE_HOST, JUDGE_PORT, RETRY_WAIT
 
 logger = main_logger.getChild("runner")
@@ -20,6 +20,8 @@ class Runner:
     port: int
     debug: bool
     threads: list[threading.Thread]
+    connection: Connection
+    protocol: RunnerProtocol
 
     def __init__(self, ip, port, debug=False):
         self.ip = ip
@@ -39,7 +41,7 @@ class Runner:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.ip, self.port))
                 self.connection = Connection(self.ip, self.port, sock, threading.Lock())
-                self.protocol = Protocol(self.connection)
+                self.protocol = RunnerProtocol(self.connection)
                 self._handle_commands()
 
             except (ConnectionRefusedError, ConnectionResetError) as e:

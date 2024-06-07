@@ -12,6 +12,12 @@ logger = main_logger.getChild("protocol.runner")
 
 
 class RunnerProtocol(Protocol):
+    """
+    The protocol class used by the runners.
+    """
+    
+    connection: Connection
+
     def __init__(self, connection: Connection):
         self.connection = connection
 

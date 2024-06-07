@@ -18,6 +18,11 @@ class JudgeProtocol(Protocol):
     The protocol class used by the judge server.
     """
 
+    connection: Connection
+    queue_dict_lock: threading.Lock
+    queue_dict: dict[str, Queue[dict]]
+    receiver_thread: threading.Thread
+
     def __init__(self, connection: Connection):
         self.connection = connection
         self.queue_dict_lock = threading.Lock()
