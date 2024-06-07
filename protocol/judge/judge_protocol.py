@@ -3,7 +3,6 @@ This module contains the JudgeProtocol class.
 """
 
 import threading
-import uuid
 from queue import Queue
 
 from custom_logger import main_logger
@@ -55,8 +54,8 @@ class JudgeProtocol(Protocol):
         """
         Send command to the runner and wait for the response.
         """
-
-        message = {"id": uuid.uuid4().hex, "command": command.name, "args": kwargs}
+        counter = self.connection.counter
+        message = {"id": counter.generate(), "command": command.name, "args": kwargs}
 
         queue = Queue()
         with self.queue_dict_lock:
