@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-import sys
 
-np.set_printoptions(threshold=sys.maxsize)
+# TODO remove
+np.set_printoptions(threshold=999999, linewidth=999999, edgeitems=999999)
 
 # return a matrix
 def process_file(file):
