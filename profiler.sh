@@ -16,7 +16,7 @@ do
   # this includes a second wait, while it calculates the average
   
   # get RAM usage using free
-  ram_usage=$(free -m | awk 'NR==2{print $3 " MB"}') # this is the absolute value
+  ram_usage=$(free -m | awk 'NR==2{print $3}') # this is the absolute value
   
   # save to CSV file
   echo "$cpu_usage, $ram_usage" >> $output_file
