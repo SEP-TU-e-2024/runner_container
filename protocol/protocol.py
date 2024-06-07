@@ -38,7 +38,7 @@ class Protocol:
             sock.sendall(data)
 
     @staticmethod
-    def receive(connection: Connection, timeout: int | None = None) -> dict:
+    def receive(connection: Connection) -> dict:
         """
         Receives a JSON message.
         """
@@ -54,16 +54,13 @@ class Protocol:
                 f"The connection was closed by the peer with ip {ip} on port {port}!"
             )
 
-        sock.settimeout(timeout)
         data_size = int.from_bytes(data, byteorder="big")
-        sock.settimeout(None)
 
         if data_size == 0:
             raise ValueError(f"The upcoming message from {ip} on {port} is of size 0!")
 
-        sock.settimeout(timeout)
         data = sock.recv(data_size)
-        sock.settimeout(None)
+
         logger.info(f"Received message {data} of size {data_size} bytes from {ip} on port {port}.")
         message = json.loads(data)
 

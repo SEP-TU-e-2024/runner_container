@@ -5,6 +5,8 @@ This module contains the Connection class.
 import socket
 import threading
 
+from .counter import Counter
+
 
 class Connection:
     """
@@ -31,8 +33,22 @@ class Connection:
     A lock used to synchronize access to the socket.
     """
 
-    def __init__(self, ip: str, port: int, sock: socket.socket, sock_lock: threading.Lock):
+    message_counter: Counter
+    """
+    A counter used to generate unique message IDs.
+    """
+
+    def __init__(
+        self,
+        ip: str,
+        port: int,
+        sock: socket.socket,
+        sock_lock: threading.Lock,
+        timeout: int | None = None,
+    ):
         self.ip = ip
         self.port = port
+        sock.settimeout(timeout)
         self.sock = sock
         self.sock_lock = sock_lock
+        self.message_counter = Counter()

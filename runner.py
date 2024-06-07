@@ -20,6 +20,8 @@ class Runner:
     port: int
     debug: bool
     threads: list[threading.Thread]
+    connection: Connection
+    protocol: RunnerProtocol
 
     def __init__(self, ip, port, debug=False):
         self.ip = ip
@@ -39,12 +41,12 @@ class Runner:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.ip, self.port))
                 self.connection = Connection(self.ip, self.port, sock, threading.Lock())
-                self.protocol = Protocol(self.connection)
+                self.protocol = RunnerProtocol(self.connection)
                 self._handle_commands()
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
                 self.connection = None
-                logger.info(f"{e}.Failed to connect to judge server. Retrying in 5 seconds...")
+                logger.info(f"Failed to connect to judge server. Retrying in 5 seconds... ({e})")
                 sleep(RETRY_WAIT)
 
             finally:
@@ -60,8 +62,8 @@ class Runner:
             thread = threading.Thread(
                 target=self.protocol.handle_command,
                 args=(command_id, command_name, command_args),
+                daemon=True,
             )
-            thread.daemon = True
             thread.start()
             self.threads.append(thread)
 
@@ -71,8 +73,8 @@ class Runner:
         """
 
         for thread in self.threads:
-            thread.join(1)
-            self.threads.clear()
+            thread.join()
+        self.threads.clear()
         if self.connection is not None:
             sock = self.connection.sock
             sock.shutdown(socket.SHUT_RDWR)

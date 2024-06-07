@@ -12,6 +12,12 @@ logger = main_logger.getChild("protocol.runner")
 
 
 class RunnerProtocol(Protocol):
+    """
+    The protocol class used by the runners.
+    """
+
+    connection: Connection
+
     def __init__(self, connection: Connection):
         self.connection = connection
 
@@ -30,14 +36,28 @@ class RunnerProtocol(Protocol):
 
         return command_id, command_name, command_args
 
-    def handle_command(self, command_id: str, command_name: str, args: dict) -> None:
+    def handle_command(self, command_id: str, command_name: str, args: dict):
         """
         Handles the incoming commands from the judge server.
         """
 
-        command = Commands[command_name].value
-        response = command.execute(args)
-        message = {"id": command_id, "response": response}
-        Protocol.send(self.connection, message)
+        try:
+            if command_name not in Commands:
+                main_logger.error(f"Received unknown command: {command_name}")
+                return
 
-        main_logger.info(f"Sent response: {response}")
+            command = Commands[command_name].value
+            response = command.execute(args)
+            message = {"id": command_id, "response": response}
+            Protocol.send(self.connection, message)
+
+            main_logger.info(f"Sent response: {response}")
+
+        except Exception as e:
+            if e is ConnectionResetError or e is ConnectionAbortedError:
+                raise e
+
+            main_logger.error(
+                f"An unexpected error has occured while trying to execute command {command_name}!",
+                exc_info=1,
+            )

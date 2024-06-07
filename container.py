@@ -75,9 +75,7 @@ class Container:
         # thread.start()
 
         for data in self.container.logs(stream=True):
-            print(f"{data.decode()}", end="")
-        
-        # thread.join()
+            logger.debug(f"{data.decode()}")
 
 # ----------------------------------------------------------------
 # TESTING

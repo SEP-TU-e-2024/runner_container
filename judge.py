@@ -8,7 +8,7 @@ import threading
 
 from custom_logger import main_logger
 from protocol import Connection
-from protocol.judge import Commands, Protocol
+from protocol.judge import Commands, JudgeProtocol
 from settings import JUDGE_PORT
 
 HOST = "localhost"  # Replace with local IP of the judge machine
@@ -28,7 +28,7 @@ def _handle_connections(client_socket: socket.socket, addr: tuple[str, int]):
     ip, port = addr
     connection = Connection(ip, port, client_socket, threading.Lock())
     disconnected = False
-    protocol = Protocol(connection)
+    protocol = JudgeProtocol(connection)
 
     try:
         # The first command is the first command that should be sent. It tests if the runner is connected correctly.
@@ -81,8 +81,9 @@ def main():
         client_socket, addr = sock.accept()
 
         logger.info(f"Incoming connection from {addr[0]} on port {addr[1]}.")
-        thread = threading.Thread(target=_handle_connections, args=(client_socket, addr))
-        thread.daemon = True
+        thread = threading.Thread(
+            target=_handle_connections, args=(client_socket, addr), daemon=True
+        )
         thread.start()
 
 

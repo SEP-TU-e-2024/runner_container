@@ -3,7 +3,6 @@ This module contains the JudgeProtocol class.
 """
 
 import threading
-import uuid
 from queue import Queue
 
 from custom_logger import main_logger
@@ -18,6 +17,11 @@ class JudgeProtocol(Protocol):
     """
     The protocol class used by the judge server.
     """
+
+    connection: Connection
+    queue_dict_lock: threading.Lock
+    queue_dict: dict[str, Queue[dict]]
+    receiver_thread: threading.Thread
 
     def __init__(self, connection: Connection):
         self.connection = connection
@@ -36,6 +40,11 @@ class JudgeProtocol(Protocol):
             message_id, response = self._receive_response()
 
             with self.queue_dict_lock:
+                if message_id not in self.queue_dict:
+                    logger.error(
+                        f"Received response from {self.connection.ip}:{self.connection.port} with unknown message id: {message_id}"
+                    )
+                    continue
                 self.queue_dict[message_id].put(response)
 
     def send_command(self, command: Commands, block: bool = False, **kwargs):
@@ -56,19 +65,31 @@ class JudgeProtocol(Protocol):
         Send command to the runner and wait for the response.
         """
 
-        message = {"id": uuid.uuid4().hex, "command": command.name, "args": kwargs}
+        try:
+            counter = self.connection.message_counter
+            message = {"id": counter.generate(), "command": command.name, "args": kwargs}
 
-        queue = Queue()
-        with self.queue_dict_lock:
-            self.queue_dict[message["id"]] = queue
+            queue = Queue()
+            with self.queue_dict_lock:
+                self.queue_dict[message["id"]] = queue
 
-        self.send(self.connection, message)
-        response = queue.get()
+            Protocol.send(self.connection, message)
+            logger.info(
+                f"Sent command {command.name} with args {kwargs} to the runner located at {self.connection.ip}:{self.connection.port}."
+            )
+            response = queue.get()
 
-        command.value.response(response)
+            command.value.response(response)
 
-        with self.queue_dict_lock:
-            del self.queue_dict[message["id"]]
+        except Exception:
+            logger.error(
+                f"Error occured while trying to execute a command for the runner located at {self.connection.ip}:{self.connection.port}.",
+                exc_info=1,
+            )
+
+        finally:
+            with self.queue_dict_lock:
+                del self.queue_dict[message["id"]]
 
     def _receive_response(self) -> tuple[str, dict]:
         """
@@ -78,12 +99,12 @@ class JudgeProtocol(Protocol):
         message = Protocol.receive(self.connection)
 
         if message["response"] is None:
-            logger.info("Received message with missing response!")
+            raise ValueError("Received message with missing response!")
 
         response = message["response"]
 
         if message["id"] is None:
-            logger.info("Received message with missing id!")
+            raise ValueError("Received message with missing id!")
 
         message_id = message["id"]
 
