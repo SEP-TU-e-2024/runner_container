@@ -32,14 +32,23 @@ class Connection:
     """
     A lock used to synchronize access to the socket.
     """
-    
+
     counter: Counter
     """
+    
     """
 
-    def __init__(self, ip: str, port: int, sock: socket.socket, sock_lock: threading.Lock):
+    def __init__(
+        self,
+        ip: str,
+        port: int,
+        sock: socket.socket,
+        sock_lock: threading.Lock,
+        timeout: int | None = None,
+    ):
         self.ip = ip
         self.port = port
+        sock.settimeout(timeout)
         self.sock = sock
         self.sock_lock = sock_lock
         self.counter = Counter()

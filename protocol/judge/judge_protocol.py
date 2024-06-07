@@ -77,12 +77,12 @@ class JudgeProtocol(Protocol):
         message = Protocol.receive(self.connection)
 
         if message["response"] is None:
-            logger.info("Received message with missing response!")
+            raise ValueError("Received message with missing response!")
 
         response = message["response"]
 
         if message["id"] is None:
-            logger.info("Received message with missing id!")
+            raise ValueError("Received message with missing id!")
 
         message_id = message["id"]
 
