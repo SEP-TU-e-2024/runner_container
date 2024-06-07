@@ -42,7 +42,7 @@ class RunnerProtocol(Protocol):
         """
 
         try:
-            if command_name not in Commands:
+            if command_name not in Commands.__members__:
                 main_logger.error(f"Received unknown command: {command_name}")
                 return
 
