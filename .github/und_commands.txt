@@ -3,7 +3,7 @@ add *.py
 add validator/
 settings -reportOutputDirectory htmlDir
 settings -metricsOutputFile metrics.csv
-list -all settings src_db.und
+settings -FileNameDisplayMode RelativePath
 analyze
 export -dependencies file matrix matrix.csv
 metrics
