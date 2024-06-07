@@ -27,6 +27,7 @@ Time in seconds to wait before retrying to connect to the judge server.
 DOCKER_FILE_PARRENT_DIR = "."  # just for testing
 
 # Mounts
+DOCKER_BASE = "/app"
 DOCKER_SUBMISSION = "/submission"
 DOCKER_VALIDATOR = "/validator"
 DOCKER_RESULTS = "/results"
