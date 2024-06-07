@@ -7,7 +7,7 @@ import threading
 
 class Counter:
     """
-    The counter class can be used to generate unique message IDs by incrementing a counter.
+    The counter class can be used to count certain actions in a thread-safe manner.
     """
 
     count: int
@@ -19,7 +19,7 @@ class Counter:
 
     def generate(self):
         """
-        This method retruns the generted unique messaage ID by incrementing a counter. This method is thread-safe.
+        This method retruns the current count. This method is thread-safe.
         """
         with self.lock:
             current_count = self.count
