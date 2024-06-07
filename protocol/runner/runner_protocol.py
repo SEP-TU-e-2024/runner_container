@@ -51,9 +51,11 @@ class RunnerProtocol(Protocol):
 
         except KeyError:
             main_logger.error(f"Received unknown command: {command_name}")
+
         except Exception as e:
             if e is ConnectionResetError or e is ConnectionAbortedError:
                 raise e
+
             main_logger.error(
                 f"An unexpected error has occured while trying to execute command {command_name}! ({e})"
             )
