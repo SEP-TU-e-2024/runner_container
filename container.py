@@ -5,6 +5,7 @@ This module contains code used for creating and managing the containers created 
 import os
 import docker
 from docker.types import Mount
+from time import time
 
 from custom_logger import main_logger
 from settings import DOCKER_FILE_PARRENT_DIR, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_TIMEOUT

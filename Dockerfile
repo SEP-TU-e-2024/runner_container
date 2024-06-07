@@ -1,4 +1,8 @@
 FROM python:3
+
+# add basic dependencies
+RUN sudo apt-get update
+RUN sudo apt-get install -y mpstat
 #FROM debian
 
 # install basic dependencies at creation time
