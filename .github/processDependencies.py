@@ -13,7 +13,7 @@ def process_file(file):
     np.set_printoptions(threshold=999999, linewidth=999999, edgeitems=999999)
 
     print('\nCyclic dependencies abc:')
-    print(df)
+    print(repr(df))
 
     return np.nan_to_num(df.to_numpy(), nan=0), list(df.columns)
 
