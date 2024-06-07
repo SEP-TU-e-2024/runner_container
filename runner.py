@@ -44,7 +44,7 @@ class Runner:
 
             except (ConnectionRefusedError, ConnectionResetError) as e:
                 self.connection = None
-                logger.info(f"{e}.Failed to connect to judge server. Retrying in 5 seconds...")
+                logger.info(f"Failed to connect to judge server. Retrying in 5 seconds... ({e})")
                 sleep(RETRY_WAIT)
 
             finally:
