@@ -9,7 +9,12 @@ def process_file(file):
     df = df.drop([index for index, row in df.iterrows() if row['Dependent File'] not in cols])
     df = df[[col for col in df.columns if (col == df["Dependent File"]).any()]].dropna(how='all')
 
-    print('\nCyclic dependencies:\n', df)
+    # TODO rems
+    print()
+    print('Cyclic dependencies:')
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(df)
+    print()
 
     return np.nan_to_num(df.to_numpy(), nan=0), list(df.columns)
 

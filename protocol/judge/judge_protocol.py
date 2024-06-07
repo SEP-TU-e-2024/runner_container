@@ -40,7 +40,7 @@ class JudgeProtocol(Protocol):
 
     def send_command(self, command: Commands, block: bool = False, **kwargs):
         """
-        Sends a given command with the given arguemtents to the runner specifed in the connection.
+        Sends a given command with the given arguments to the runner specifed in the connection.
         """
 
         if block:
@@ -70,7 +70,7 @@ class JudgeProtocol(Protocol):
         with self.queue_dict_lock:
             del self.queue_dict[message["id"]]
 
-    def _receive_response(self):
+    def _receive_response(self) -> tuple[str, dict]:
         """
         Receives a response from the runner.
         """
