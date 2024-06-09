@@ -20,8 +20,7 @@ Time in seconds to wait before retrying to connect to the judge server.
 # ----------------------------------------------------------------
 # Docker
 # ----------------------------------------------------------------
-DOCKER_FILE_PARRENT_DIR = "."  # just for testing
-# DOCKER_IMAGE = "runnercontainer"
+DOCKER_IMAGE = "test"
 
 # Mounts
 DOCKER_SUBMISSION = "/submission"
