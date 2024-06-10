@@ -1,8 +1,10 @@
-import csv
 import os
 
 import psutil
 
+import subprocess
+
+import re
 
 class IOModule:
     """
@@ -35,15 +37,36 @@ class IOModule:
         """
         pass
 
+    def __extract_VmPeak(info_string):
+        """
+        Function to extract the VmPeak value from the process status output.
+        """
+        pattern = r'VmPeak:\s*([0-9]+)\s+kB'
+        match = re.search(pattern, info_string)
+
+        if match:
+            return match.group(1)
+        else:
+            return None
+
     def __del__(self):
         """On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file"""
 
-        # Get the metrics: performance & problem specific metrics
+        # get cpu times
         current_process = psutil.Process(os.getpid())
-        metrics = {**current_process.as_dict(attrs=self._PERFORMANCE_ATTRS), **self._score()}
+        cpu_times = current_process.cpu_times();
+        cpu_times_sum = cpu_times.user + cpu_times.system + cpu_times.children_user + cpu_times.children_system;
+
+        # obtain MaxRSS from /proc/{pid}/status
+        proc_directory = '/proc/' + str(os.getpid()) + '/status'
+        result = subprocess.run(['cat', proc_directory], capture_output=True, text=True)
+        
+        max_memory = self.__extract_VmPeak(result.stdout)
 
         # Write metrics to csv file
-        with open(self._OUTPUT_FILE, "+w") as f:
-            dict_writer = csv.DictWriter(f, metrics.keys())
-            dict_writer.writeheader()
-            dict_writer.writerows([metrics])
+        metrics_file = open(self._OUTPUT_FILE, 'w', newline='')
+        metrics_file.write("Max RAM usage (kB), CPU Time (s), Score\n")
+        metrics_file.write(max_memory + ", ")
+        metrics_file.write(str(cpu_times_sum) + ", ")
+        metrics_file.write(str(self._score()['score']))
+        metrics_file.close()
