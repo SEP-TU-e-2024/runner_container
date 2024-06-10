@@ -1,3 +1,7 @@
+"""
+This module contains the settings for the runner.
+"""
+
 # ----------------------------------------------------------------
 # Connection
 # ----------------------------------------------------------------
@@ -23,6 +27,7 @@ Time in seconds to wait before retrying to connect to the judge server.
 DOCKER_IMAGE = "test"
 
 # Mounts
+DOCKER_BASE = "/app"
 DOCKER_SUBMISSION = "/submission"
 DOCKER_VALIDATOR = "/validator"
 DOCKER_RESULTS = "/results"

@@ -1,3 +1,9 @@
+#!/bin/bash
+
+# run the profiler in the background
+profiler.sh &
+
+# make a directory for the running environement
 mkdir runenv
 mkdir unpack_dir
 
@@ -19,4 +25,5 @@ pipenv shell
 pipenv install -r requirements.txt
 pipenv install -r validator/requirements.txt
 
+# run the main code
 python main.py

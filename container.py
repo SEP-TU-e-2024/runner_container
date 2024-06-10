@@ -35,6 +35,7 @@ class Container:
         """
         Configures the mounts for the container.
         """
+        
         cwd = os.getcwd()
         
         # create mounts for this directory
@@ -84,7 +85,7 @@ class Container:
         self.container.start()
 
         for data in self.container.logs(stream=True):
-            print(f"{data.decode()}", end="")
+            self.logger.debug(f"{data.decode()}")
 
 
 # ----------------------------------------------------------------
