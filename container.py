@@ -5,25 +5,24 @@ This module contains code used for creating and managing the containers created 
 import os
 import shutil
 import random
+import requests
 
 import docker
 from docker.types import Mount
+from custom_logger import main_logger
 
 from settings import DOCKER_IMAGE, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
 
 
 class Container:
-    dirs = [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS]
-
-    def __init__(self, submission: str, problem: str):
-        self.submission = submission
-        self.problem = problem
-
+    def __init__(self, submission_url: str, problem_url: str):
         self.id = f"{random.randint(0, 9999)}-{random.randint(0, 0xffffffff)}"
+        self.logger = main_logger.getChild(f"container-{self.id}")
 
         self.docker_client = docker.from_env()
         self._config_mounts()
-        self._setup_mounts_content()
+        self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
+        self._setup_mount_content(problem_url, f"{DOCKER_VALIDATOR}/validator.zip")
         self.container = self.docker_client.containers.create(
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True
         )
@@ -39,7 +38,7 @@ class Container:
         cwd = os.getcwd()
         
         # create mounts for this directory
-        for dir in self.dirs:
+        for dir in [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS]:
             os.makedirs(f"{cwd}/{self.id}{dir}")
 
         # define the mounts for the docker container
@@ -64,14 +63,24 @@ class Container:
             ),
         ]
 
-    def _setup_mounts_content(self):
-        pass
+    def _setup_mount_content(self, url: str, output_file: str):
+        response = requests.get(url)
+        
+        file_path = f"{os.getcwd()}/{self.id}{output_file}"
 
-    def run(self, submission, validator):
+        if response.status_code == 200:
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+            self.logger.info(f"File downloaded succesfully from: {url}, filename: {file_path}")
+        else:
+            self.logger.info(f"Could not download file from: {url}, filename: {file_path}")
+            raise Exception(f"Error could not download {output_file} from {url}")
+
+    def run(self):
         """
         Run the container.
         """
-        print("Running...")
+        self.logger.info("Running...")
         self.container.start()
 
         for data in self.container.logs(stream=True):
