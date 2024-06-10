@@ -14,6 +14,8 @@ class StartCommand(Command):
 
     @staticmethod
     def execute(args: dict):
-        container = Container()
+        if "submission" not in args or "validator" not in args:
+            return {"status": 400}
+        container = Container(submission_url=args["submission"], problem_url=args["validator"])
         container.run()
         return {"status": "ok"}
