@@ -18,8 +18,8 @@ class IOModule:
         _score defines all problem specific metrics and computes those values, it must be overwritten by Validator.
         It must return a dictionary where it maps each metric to a value (dict[string, any type]).
         """
-        return {'score':0}
-    
+        return {"score": 0}
+
     def obtain_data(self):
         """
         obtain_data is called by the submission code to obtain a new (or the initial) state of the current problem.
@@ -37,18 +37,20 @@ class IOModule:
     def __del__(self):
         """On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file"""
 
-        # get cpu times
+        # Get CPU times
         current_process = psutil.Process(os.getpid())
         cpu_times = current_process.cpu_times()
-        cpu_times_sum = cpu_times.user + cpu_times.system + cpu_times.children_user + cpu_times.children_system
+        cpu_times_sum = (
+            cpu_times.user + cpu_times.system + cpu_times.children_user + cpu_times.children_system
+        )
 
-        # obtain MaxRSS
+        # Obtain MaxRSS
         max_memory = ""
 
         # Write metrics to csv file
-        metrics_file = open(self._OUTPUT_FILE, 'w', newline='')
+        metrics_file = open(self._OUTPUT_FILE, "w", newline="")
         metrics_file.write("Max RAM usage (kB), CPU Time (s), Score\n")
         metrics_file.write(max_memory + ", ")
         metrics_file.write(str(cpu_times_sum) + ", ")
-        metrics_file.write(str(self._score()['score']))
+        metrics_file.write(str(self._score()["score"]))
         metrics_file.close()
