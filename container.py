@@ -30,36 +30,41 @@ class Container:
         
     def __del__(self):
         # remove the directory and all subdirectories corresponding to this container (based on id)
-        shutil.rmtree(f"{os.getcwd()}/{self.id}")
+        shutil.rmtree(self._folder())
+
+    def _folder(self, path: str = None):
+        if path:
+            if path[0] == "/":
+                path = path[1:]
+            return os.path.join(os.getcwd(), self.id, path)
+        return os.path.join(os.getcwd(), self.id)
 
     def _config_mounts(self):
         """
         Configures the mounts for the container.
         """
         
-        cwd = os.getcwd()
-        
         # create mounts for this directory
         for dir in [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS]:
-            os.makedirs(f"{cwd}/{self.id}{dir}")
+            os.makedirs(self._folder(dir))
 
         # define the mounts for the docker container
         self.mounts = [
             Mount(
                 target=DOCKER_SUBMISSION,
-                source=f"{cwd}/{self.id}{DOCKER_SUBMISSION}",
+                source=self._folder(DOCKER_SUBMISSION),
                 type="bind",
                 read_only=True,
             ),
             Mount(
                 target=DOCKER_VALIDATOR,
-                source=f"{cwd}/{self.id}{DOCKER_VALIDATOR}",
+                source=self._folder(DOCKER_VALIDATOR),
                 type="bind",
                 read_only=True,
             ),
             Mount(
                 target=DOCKER_RESULTS,
-                source=f"{cwd}/{self.id}{DOCKER_RESULTS}",
+                source=self._folder(DOCKER_RESULTS),
                 type="bind",
                 read_only=False
             ),
@@ -68,7 +73,7 @@ class Container:
     def _setup_mount_content(self, url: str, output_file: str):
         response = requests.get(url)
         
-        file_path = f"{os.getcwd()}/{self.id}{output_file}"
+        file_path = self._folder(output_file)
 
         if response.status_code == 200:
             with open(file_path, 'wb') as file:
@@ -82,8 +87,11 @@ class Container:
     def _format_results(self):
         res = ""
         
-        for file in os.listdir(f"{os.getcwd()}/{self.id}{DOCKER_RESULTS}"):
-            self.logger.info(str(file))
+        for file in os.listdir(self._folder(DOCKER_RESULTS)):
+            with open(self._folder(f"{DOCKER_RESULTS}/{file}"), "r") as f:
+                res += ''.join(f.readlines())
+        self.logger.info(res)
+        return res
 
     def run(self):
         """

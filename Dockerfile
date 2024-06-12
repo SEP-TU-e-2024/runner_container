@@ -1,10 +1,10 @@
-FROM debian
+FROM python:3
 
 # add basic dependencies
-RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv
-RUN apt-get install unzip 
+RUN apt update -y
+RUN apt install unzip
 
-WORKDIR /app
+WORKDIR /
 
 COPY start.sh start.sh
 RUN chmod +x start.sh
