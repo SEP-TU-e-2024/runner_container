@@ -9,6 +9,7 @@ class CheckCommand(Command):
     """
     Command used to check the status of the runner.
     """
-    
-    def execute(self, args: dict):
+
+    @staticmethod
+    def execute(args: dict):
         return {"status": "ok"}

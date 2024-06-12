@@ -12,7 +12,8 @@ class StartCommand(Command):
     The StartCommand class is used to start a container on the runner.
     """
 
-    def execute(self, args: dict):
+    @staticmethod
+    def execute(args: dict):
         container = Container()
         container.run()
         return {"status": "ok"}
