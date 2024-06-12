@@ -2,7 +2,7 @@ FROM python:3
 
 # add basic dependencies
 RUN apt-get update
-RUN apt-get install -y sysstat
+RUN apt-get install -y sysstat time
 # this is for mpstat
 
 #RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv 

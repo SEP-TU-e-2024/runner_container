@@ -17,5 +17,5 @@ cd runenv
 # run the profiler in the background
 /app/profiler.sh &
 
-# run the main code
-python main.py
+# run the main code in a time wrapper, so that the statistics can be tracked
+/usr/bin/time -f "Wall time,User time,System time,User child time,System child time,Max RAM\n%e,%U,%S,%u,%s,%M" -o /results/CPU_times.csv python main.py
