@@ -37,20 +37,8 @@ class IOModule:
     def __del__(self):
         """On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file"""
 
-        # Get CPU times
-        current_process = psutil.Process(os.getpid())
-        cpu_times = current_process.cpu_times()
-        cpu_times_sum = (
-            cpu_times.user + cpu_times.system + cpu_times.children_user + cpu_times.children_system
-        )
-
-        # Obtain MaxRSS
-        max_memory = ""
-
-        # Write metrics to csv file
+        # Write score metrics to csv file
         metrics_file = open(self._OUTPUT_FILE, "w", newline="")
-        metrics_file.write("Max RAM usage (kB), CPU Time (s), Score\n")
-        metrics_file.write(max_memory + ", ")
-        metrics_file.write(str(cpu_times_sum) + ", ")
+        metrics_file.write("Score\n")
         metrics_file.write(str(self._score()["score"]))
         metrics_file.close()
