@@ -1,5 +1,5 @@
 from csv import DictReader
-from json import dump
+from json import dumps
 from os import path
 
 
@@ -10,13 +10,13 @@ def conversion():
     with open(path.join('results/results.csv')) as file:
         csv_reader = DictReader(file)
         data = list(csv_reader)
-    results_string = dump(data)
+    results_string = dumps(data)
 
     # convert metrics.scv from csv to a json string
     with open(path.join('results/metrics.csv')) as file:
         csv_reader = DictReader(file)
         data = list(csv_reader)
-    metrics_string = dump(data)
+    metrics_string = dumps(data)
 
     return results_string, metrics_string
 
