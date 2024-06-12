@@ -35,7 +35,9 @@ class IOModule:
         pass
 
     def __del__(self):
-        """On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file"""
+        """
+        On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file
+        """
 
         # Get CPU times
         current_process = psutil.Process(os.getpid())
