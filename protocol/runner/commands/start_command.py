@@ -15,4 +15,4 @@ class StartCommand(Command):
     def execute(self, args: dict):
         container = Container()
         container.run()
-        return {"status": "ok"}
+        return {"status": "ok", "result": "abcd"}
