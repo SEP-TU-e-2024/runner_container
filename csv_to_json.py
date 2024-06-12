@@ -18,7 +18,13 @@ def conversion():
         data = list(csv_reader)
     metrics_string = dumps(data)
 
-    return results_string, metrics_string
+    # convert CPU_times.scv from csv to a json string
+    with open(path.join('results/CPU_times.csv')) as file:
+        csv_reader = DictReader(file)
+        data = list(csv_reader)
+    CPU_times_string = dumps(data)
+
+    return results_string, metrics_string, CPU_times_string
 
 # for testing purposes only
 def main():
