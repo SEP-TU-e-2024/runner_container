@@ -9,10 +9,9 @@ class Command(ABC):
     """
     Base abstract class for commands.
     """
-
-    @staticmethod
+    
     @abstractmethod
-    def execute(args: dict) -> dict:
+    def execute(self, args: dict) -> dict:
         """
         Executes the command. It is recommended to call this in a separate thread.
         """

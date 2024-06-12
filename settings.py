@@ -6,7 +6,7 @@ This module contains the settings for the runner.
 # Connection
 # ----------------------------------------------------------------
 
-JUDGE_HOST = "localhost"
+JUDGE_HOST = "10.1.0.6" # TODO: change to prod version, currently IP of the jumpbox, ask Teun for how to use it
 """
 Host of the the judge server.
 """
