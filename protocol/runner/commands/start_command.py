@@ -13,6 +13,12 @@ class StartCommand(Command):
     """
 
     def execute(self, args: dict):
+        submission_url = args["submission"]
+        validator_url = args["validator"]
+
+        # TODO: use URLs above, and get and send result
+        print(f"Starting container with submission: {submission_url} and validator: {validator_url}")
         container = Container()
         container.run()
+
         return {"status": "ok", "result": "abcd"}
