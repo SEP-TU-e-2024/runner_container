@@ -12,6 +12,5 @@ class InfoCommand(Command):
     Command used to get the machine name of the runner.
     """
 
-    @staticmethod
-    def execute(args: dict):
+    def execute(self, args: dict):
         return {"machine_name": platform.node()}
