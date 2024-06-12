@@ -1,7 +1,9 @@
 from csv import DictReader
 from json import dump
 from os import path
+
 from settings import DOCKER_RESULTS
+
 
 def conversion():
     '''Function to convert files to json strings'''
