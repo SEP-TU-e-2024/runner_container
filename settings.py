@@ -6,7 +6,7 @@ This module contains the settings for the runner.
 # Connection
 # ----------------------------------------------------------------
 
-JUDGE_HOST = "20.117.224.16"
+JUDGE_HOST = "10.1.0.4"
 """
 Host of the the judge server.
 """
