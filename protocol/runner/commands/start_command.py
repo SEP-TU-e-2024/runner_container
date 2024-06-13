@@ -12,13 +12,10 @@ class StartCommand(Command):
     The StartCommand class is used to start a container on the runner.
     """
 
-    def execute(self, args: dict):
-        submission_url = args["submission"]
-        validator_url = args["validator"]
-
-        # TODO: use URLs above, and get and send result
-        print(f"Starting container with submission: {submission_url} and validator: {validator_url}")
-        container = Container()
-        container.run()
-
-        return {"status": "ok", "result": "abcd"}
+    @staticmethod
+    def execute(args: dict):
+        if "submission" not in args or "validator" not in args:
+            return {"status": 400}
+        container = Container(submission_url=args["submission"], problem_url=args["validator"])
+        res = container.run()
+        return {"status": "ok", "results": res}

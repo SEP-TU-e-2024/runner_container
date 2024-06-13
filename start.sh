@@ -1,18 +1,27 @@
 #!/bin/bash
 
+# This script should start in /app
+
 # make a directory for the running environement
-mkdir runenv
+mkdir /app/unpack_dir
+mkdir /app/runenv
 
-# This is just for testing, use pip env in final code
-pip install -r submission/requirements.txt
+# unzip the submission code & find the directory that contains main
+# then we copy all contents from that directory to runenv
+unzip /submission/submission.zip -d /app/unpack_dir
+cp -r $(dirname $(find /app/unpack_dir -name "main.py" | head -n 1))/** /app/runenv
+rm -rf /app/unpack_dir/*
+
+# unzip all validator files & find the directory that contains the validator file
+# after we clean everything up
+unzip /validator/validator.zip -d /app/unpack_dir
+cp -r $(dirname $(find /app/unpack_dir -name "validator.py" | head -n 1)) /app/runenv
+rm -rf /app/unpack_dir
+
+cd /app/runenv
+
+pip install -r requirements.txt
 pip install -r validator/requirements.txt
-
-# copy the submission and validator code to the running environment
-cp -r submission/** ./runenv
-cp -r validator/** ./runenv
-
-# change to the running environment
-cd runenv
 
 # run the profiler in the background
 /app/profiler.sh &

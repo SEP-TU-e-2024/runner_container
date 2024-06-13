@@ -1,11 +1,8 @@
 FROM python:3
 
 # add basic dependencies
-RUN apt-get update
-RUN apt-get install -y sysstat time
-# this is for mpstat
-
-#RUN apt-get update -y && apt-get install -y python3 python3-pip python3-venv 
+RUN apt-get update -y
+RUN apt-get install -y sysstat time unzip
 
 WORKDIR /app
 
@@ -15,5 +12,3 @@ COPY profiler.sh profiler.sh
 RUN chmod +x profiler.sh
 
 CMD ./start.sh
-
-# CHANGE THIS DOCKERFILE, THIS IS JUST FOR TESTING
