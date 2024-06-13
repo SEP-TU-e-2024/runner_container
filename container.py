@@ -20,7 +20,6 @@ class Container:
         self.logger = main_logger.getChild(f"container-{self.id}")
 
         self.docker_client = docker.from_env()
-        self.logger.info(self.docker_client.images.list())
         self._config_mounts()
         self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
         self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
