@@ -3,7 +3,6 @@
 output_file="/results/metrics.csv"
 
 # remove the file if it exists and create it
-rm $output_file
 touch $output_file
 
 # print header to the CSV file
