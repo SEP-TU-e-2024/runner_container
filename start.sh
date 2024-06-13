@@ -4,7 +4,7 @@
 
 # make a directory for the running environement
 mkdir /app/unpack_dir
-mkdir /app/runenv
+mkdir -p /app/runenv/validator
 
 # unzip the submission code & find the directory that contains main
 # then we copy all contents from that directory to runenv
@@ -15,7 +15,7 @@ rm -rf /app/unpack_dir/*
 # unzip all validator files & find the directory that contains the validator file
 # after we clean everything up
 unzip /validator/validator.zip -d /app/unpack_dir
-cp -r $(dirname $(find /app/unpack_dir -name "validator.py" | head -n 1)) /app/runenv
+cp -r $(dirname $(find /app/unpack_dir -name "validator.py" | head -n 1))/** /app/runenv/validator
 rm -rf /app/unpack_dir
 
 cd /app/runenv
