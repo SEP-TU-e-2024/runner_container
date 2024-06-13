@@ -3,14 +3,14 @@ This module contains code used for creating and managing the containers created 
 """
 
 import os
-import shutil
 import random
-import requests
+import shutil
 
 import docker
+import requests
 from docker.types import Mount
-from custom_logger import main_logger
 
+from custom_logger import main_logger
 from settings import DOCKER_IMAGE, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
 
 
@@ -109,8 +109,7 @@ class Container:
 # ----------------------------------------------------------------
 # TESTING
 # ----------------------------------------------------------------
+# Run python3 -m http.server in local_testing
 if __name__ == "__main__":
-    # run: python3 -m http.server 
-    # in a folder that contains these zip files
     c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip")
     c.run()
