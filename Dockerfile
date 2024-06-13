@@ -1,9 +1,8 @@
 FROM python:3
 
 # add basic dependencies
-RUN apt update -y
-RUN apt install unzip
-RUN apt install -y sysstat time
+RUN apt-get update -y
+RUN apt-get install -y sysstat time unzip
 
 WORKDIR /app
 
