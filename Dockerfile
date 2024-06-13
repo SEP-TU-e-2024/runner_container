@@ -3,8 +3,9 @@ FROM python:3
 # add basic dependencies
 RUN apt update -y
 RUN apt install unzip
+RUN apt install -y sysstat time
 
-WORKDIR /
+WORKDIR /app
 
 COPY start.sh start.sh
 RUN chmod +x start.sh
