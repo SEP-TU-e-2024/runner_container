@@ -39,8 +39,10 @@ cp -r ./ /usr/local/bin/judge_runner/
 ENTRYPOINT=runner.py
 chmod +x /usr/local/bin/judge_runner/$ENTRYPOINT
 
+# TODO: build in start of program instead, if non-existent
 cd /usr/local/bin/judge_runner/
 docker build -t runnercontainer .
+
 
 # Define service
 echo "-- Creating service"
