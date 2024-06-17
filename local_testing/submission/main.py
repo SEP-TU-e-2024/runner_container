@@ -1,0 +1,14 @@
+# Dummy code for testing functionality of the IOModule
+
+from validator.validator import Validator
+from time import sleep
+
+io = Validator()
+
+a = io.obtain_data("Enter a number: ")
+b = io.obtain_data("Enter another number: ")
+sum = int(a) + int(b)
+
+io.push_data(str(sum))
+
+sleep(5)
