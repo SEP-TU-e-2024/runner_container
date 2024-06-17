@@ -23,6 +23,8 @@ cd /app/runenv
 pip install -r requirements.txt
 pip install -r validator/requirements.txt
 
+echo "Starting the main code"
+
 # run the profiler in the background
 /app/profiler.sh &
 

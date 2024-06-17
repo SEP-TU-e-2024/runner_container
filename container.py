@@ -106,6 +106,8 @@ class Container:
 
         for data in self.container.logs(stream=True):
             self.logger.info(f"Docker: {data.decode()}")
+            if (data.decode().find("Starting the main code") != -1):
+                self.__network_kill()
         
         return self._format_results()
     
@@ -115,6 +117,19 @@ class Container:
         """
         self.logger.info("Timeout reached. Stopping container.")
         self.container.stop(timeout = 0);
+    def __network_kill(self):
+        """
+        Remove the network connection when the main.py file is executed
+        """
+        for network in self.docker_client.networks.list():
+            network.reload()
+            container_connections = network.attrs.get('Containers', {})
+            
+            # Check if the container is connected to the current network
+            if self.container.id in container_connections:
+                network.disconnect(self.container)
+                print(f"Disconnected {self.container.name} from network {network.name}")
+        
 
 
 # ----------------------------------------------------------------
