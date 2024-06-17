@@ -28,8 +28,7 @@ class Container:
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
             cpu_period=100000, cpu_quota=cpu_limit * 100000, mem_limit=f"{memory_limit}m",
         )
-        stop_timer = Timer(timeout, self.__timeout_stop)
-        stop_timer.start()
+        self.stop_timer = Timer(timeout, self.__timeout_stop)
         
     def __del__(self):
         self.tidy()
@@ -109,6 +108,7 @@ class Container:
         Run the container.
         """
         self.logger.info("Running...")
+        self.stop_timer.start()
         self.container.start()
 
         for data in self.container.logs(stream=True):
@@ -117,6 +117,7 @@ class Container:
                 self.__network_kill()
         
         self._make_archive()
+        self.stop_timer.cancel()
         return self._format_results()
     
     def __timeout_stop(self):
