@@ -103,6 +103,13 @@ class Container:
             self.logger.info(f"Docker: {data.decode()}")
         
         return self._format_results()
+    
+    def stop(self):
+        """
+        Stop the container.
+        """
+        self.logger.info("Stopping...")
+        self.container.stop()
 
 
 # ----------------------------------------------------------------
