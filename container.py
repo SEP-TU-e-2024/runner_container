@@ -33,7 +33,6 @@ class Container:
         
     def __del__(self):
         self.tidy()
-        pass
 
     def tidy(self):
         '''
