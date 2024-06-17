@@ -5,6 +5,8 @@ This module contains code used for creating and managing the containers created 
 import os
 import random
 import shutil
+from csv import DictReader
+from os import path
 from threading import Timer
 
 import docker
@@ -92,13 +94,25 @@ class Container:
 
     # This function needs to be changed later when we add vlads code
     def _format_results(self):
-        res = ""
-        
-        for file in os.listdir(self._folder(DOCKER_RESULTS)):
-            with open(self._folder(f"{DOCKER_RESULTS}/{file}"), "r") as f:
-                res += ''.join(f.readlines())
-        self.logger.info(res)
-        return res
+        res_folder = self._folder(DOCKER_RESULTS)
+
+        with open(path.join(res_folder, 'results.csv')) as file:
+            csv_reader = DictReader(file)
+            results = list(csv_reader)
+
+        with open(path.join(res_folder, 'metrics.csv')) as file:
+            csv_reader = DictReader(file)
+            metrics = list(csv_reader)
+
+        with open(path.join(res_folder, 'CPU_times.csv')) as file:
+            csv_reader = DictReader(file)
+            cpu_times = list(csv_reader)
+
+        return {
+            "results": results,
+            "metrics": metrics,
+            "cpu_times": cpu_times
+        }
 
     def run(self):
         """
@@ -144,4 +158,5 @@ class Container:
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
     c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 20, cpu_limit = 1, memory_limit = 512)
-    c.run()
+    out = c.run()
+    print(repr(out))
