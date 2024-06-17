@@ -5,7 +5,6 @@ This module contains code used for creating and managing the containers created 
 import os
 import random
 import shutil
-
 from threading import Timer
 
 import docker
@@ -32,7 +31,7 @@ class Container:
         stop_timer.start()
         
     def __del__(self):
-        self.tidy();
+        self.tidy()
         pass
 
     def tidy(self):
@@ -122,7 +121,7 @@ class Container:
         Kill the container.
         """
         self.logger.info("Timeout reached. Stopping container.")
-        self.container.stop(timeout = 0);
+        self.container.stop(timeout = 0)
     def __network_kill(self):
         """
         Remove the network connection when the main.py file is executed

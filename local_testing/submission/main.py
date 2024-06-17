@@ -1,7 +1,8 @@
 # Dummy code for testing functionality of the IOModule
 
-from validator.validator import Validator
 from time import sleep
+
+from validator.validator import Validator
 
 io = Validator()
 
