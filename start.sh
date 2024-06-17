@@ -18,10 +18,15 @@ unzip /validator/validator.zip -d /app/unpack_dir
 cp -r $(dirname $(find /app/unpack_dir -name "validator.py" | head -n 1))/** /app/runenv/validator
 rm -rf /app/unpack_dir
 
+# change the working directory to runenv
 cd /app/runenv
 
+# install the requirements
 pip install -r requirements.txt
 pip install -r validator/requirements.txt
+
+# signal that the main code is starting
+echo "Starting the main code"
 
 # run the profiler in the background
 /app/profiler.sh &
