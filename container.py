@@ -25,8 +25,8 @@ class Container:
         self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
         self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
         self.container = self.docker_client.containers.create(
-            image=DOCKER_IMAGE, mounts=self.mounts, detach=True, 
-            cpu_period=100000, cpu_quota=cpu_limit*100000, mem_limit=f"{memory_limit}m",
+            image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
+            cpu_period=100000, cpu_quota=cpu_limit * 100000, mem_limit=f"{memory_limit}m",
         )
         stop_timer = Timer(timeout, self.__timeout_stop)
         stop_timer.start()
