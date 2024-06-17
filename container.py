@@ -16,7 +16,7 @@ from settings import DOCKER_IMAGE, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VAL
 
 
 class Container:
-    def __init__(self, submission_url: str, validator_url: str, timeout: int = 60):
+    def __init__(self, submission_url: str, validator_url: str, timeout: int = 60, cpu_limit: int = 1, memory_limit: int = 512):
         self.id = f"{random.randint(0, 9999)}-{random.randint(0, 0xffffffff)}"
         self.logger = main_logger.getChild(f"container-{self.id}")
 
@@ -25,7 +25,8 @@ class Container:
         self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
         self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
         self.container = self.docker_client.containers.create(
-            image=DOCKER_IMAGE, mounts=self.mounts, detach=True
+            image=DOCKER_IMAGE, mounts=self.mounts, detach=True, 
+            cpu_period=100000, cpu_quota=cpu_limit*100000, mem_limit=f"{memory_limit}m",
         )
         stop_timer = Timer(timeout, self.__timeout_stop)
         stop_timer.start()
@@ -146,5 +147,5 @@ class Container:
 # ----------------------------------------------------------------
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 20)
+    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 20, cpu_limit = 1, memory_limit = 512)
     c.run()
