@@ -40,13 +40,15 @@ class Container:
         '''
         shutil.rmtree(self._folder())
 
-
     def _folder(self, path: str = None):
         if path:
             if path[0] == "/":
                 path = path[1:]
             return os.path.join(os.getcwd(), self.id, path)
         return os.path.join(os.getcwd(), self.id)
+    
+    def _make_archive(self):
+        shutil.make_archive(self.id, 'zip', self._folder() + "/results")
 
     def _config_mounts(self):
         """
@@ -114,6 +116,7 @@ class Container:
             if (data.decode().find("Starting the main code") != -1):
                 self.__network_kill()
         
+        self._make_archive()
         return self._format_results()
     
     def __timeout_stop(self):
@@ -122,6 +125,7 @@ class Container:
         """
         self.logger.info("Timeout reached. Stopping container.")
         self.container.stop(timeout = 0)
+
     def __network_kill(self):
         """
         Remove the network connection when the main.py file is executed
@@ -142,5 +146,5 @@ class Container:
 # ----------------------------------------------------------------
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 3)
+    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 20)
     c.run()
