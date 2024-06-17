@@ -45,9 +45,6 @@ class Container:
                 path = path[1:]
             return os.path.join(os.getcwd(), self.id, path)
         return os.path.join(os.getcwd(), self.id)
-    
-    def _make_archive(self):
-        shutil.make_archive(self.id, 'zip', self._folder() + "/results")
 
     def _config_mounts(self):
         """
@@ -115,8 +112,7 @@ class Container:
             self.logger.info(f"Docker: {data.decode()}")
             if (data.decode().find("Starting the main code") != -1):
                 self.__network_kill()
-        
-        self._make_archive()
+
         self.stop_timer.cancel()
         return self._format_results()
     
