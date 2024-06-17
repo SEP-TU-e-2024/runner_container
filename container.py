@@ -6,6 +6,8 @@ import os
 import random
 import shutil
 
+from threading import Timer
+
 import docker
 import requests
 from docker.types import Mount
@@ -15,7 +17,7 @@ from settings import DOCKER_IMAGE, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VAL
 
 
 class Container:
-    def __init__(self, submission_url: str, validator_url: str):
+    def __init__(self, submission_url: str, validator_url: str, timeout: int = 60):
         self.id = f"{random.randint(0, 9999)}-{random.randint(0, 0xffffffff)}"
         self.logger = main_logger.getChild(f"container-{self.id}")
 
@@ -26,10 +28,13 @@ class Container:
         self.container = self.docker_client.containers.create(
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True
         )
+        stop_timer = Timer(timeout, self.__timeout_stop)
+        stop_timer.start()
         
     def __del__(self):
         # remove the directory and all subdirectories corresponding to this container (based on id)
-        shutil.rmtree(self._folder())
+        # shutil.rmtree(self._folder())
+        pass
 
     def _folder(self, path: str = None):
         if path:
@@ -104,12 +109,12 @@ class Container:
         
         return self._format_results()
     
-    def stop(self):
+    def __timeout_stop(self):
         """
-        Stop the container.
+        Kill the container.
         """
-        self.logger.info("Stopping...")
-        self.container.stop()
+        self.logger.info("Timeout reached. Stopping container.")
+        self.container.stop(timeout = 0);
 
 
 # ----------------------------------------------------------------
@@ -117,5 +122,5 @@ class Container:
 # ----------------------------------------------------------------
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip")
+    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 3)
     c.run()
