@@ -13,7 +13,7 @@ class TestCounter:
         #Check whether the counter succesfully works
         assert self.counter.generate() == 0
         assert self.counter.generate() == 1
-        assert self.counter.generate() == 2
+        assert self.counter.generate() == 4
         assert self.counter.generate() == 3
     
     #Define a function to be used by the thread testing
