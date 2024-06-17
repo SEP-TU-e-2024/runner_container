@@ -32,9 +32,15 @@ class Container:
         stop_timer.start()
         
     def __del__(self):
-        # remove the directory and all subdirectories corresponding to this container (based on id)
-        # shutil.rmtree(self._folder())
+        self.tidy();
         pass
+
+    def tidy(self):
+        '''
+        remove the directory and all subdirectories corresponding to this container (based on id)
+        '''
+        shutil.rmtree(self._folder())
+
 
     def _folder(self, path: str = None):
         if path:
