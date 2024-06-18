@@ -37,6 +37,7 @@ class IOModule:
 
         # Write score metrics to csv file
         metrics_file = open(self._OUTPUT_FILE, "w", newline="")
-        metrics_file.write("Score\n")
-        metrics_file.write(str(self._score()["score"]))
+        scores = self._score()
+        metrics_file.write(','.join(scores.keys()) + '\n')
+        metrics_file.write(','.join([str(x) for x in scores.values()]) + '\n')
         metrics_file.close()
