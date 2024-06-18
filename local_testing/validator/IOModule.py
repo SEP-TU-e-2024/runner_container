@@ -1,7 +1,4 @@
-
-
-
-class IOModule:
+class IOModule:  # noqa: N999
     """
     This is a base class that should be used as a template for the Validator.
     It defines some basic functionality that should be implemented by the Validator: _score, obtain_data and push_data.
