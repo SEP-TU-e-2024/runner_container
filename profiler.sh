@@ -1,9 +1,7 @@
 #!/bin/bash
 
-output_file="/results/metrics.csv"
-
 # remove the file if it exists and create it
-touch $output_file
+touch $1
 
 # print header to the CSV file
 echo "CPU Usage percent, RAM Usage MB" > $output_file

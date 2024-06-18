@@ -21,6 +21,9 @@ rm -rf /app/unpack_dir
 # change the working directory to runenv
 cd /app/runenv
 
+# make a directory to copy the instances to
+mkdir instances
+
 # install the requirements
 pip install -r requirements.txt
 pip install -r validator/requirements.txt
@@ -29,7 +32,15 @@ pip install -r validator/requirements.txt
 echo "Starting the main code"
 
 # run the profiler in the background
-/app/profiler.sh &
+/app/profiler.sh /results/metrics.csv &
 
-# run the main code in a time wrapper, so that the statistics can be tracked
-/usr/bin/time -f "Wall time,User time,System time,Max RAM(KB)\n%e,%U,%S,%M" -o /results/CPU_times.csv python main.py
+for file in /instances/*; do
+    # copy instance into runenv
+    rm -rf /app/runenv/instances/*
+    cp -r $file /app/runenv/instances
+
+    # create a new output folder in results
+
+    # run the main code in a time wrapper, so that the statistics can be tracked
+    /usr/bin/time -f "Wall time,User time,System time,Max RAM(KB)\n%e,%U,%S,%M" -o /results/CPU_times.csv python main.py
+done
