@@ -16,6 +16,9 @@ class StartCommand(Command):
     def execute(args: dict):
         if any(required not in args for required in ["submission_url", "validator_url", "evaluation_settings", "benchmark_instances"]):
             return {"status": "error"}
-        container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], instances=args["benchmark_instances"], settings=args["evaluation_settings"])
-        res = container.run()
-        return {"status": "ok", "results": res}
+        try:
+            container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], instances=args["benchmark_instances"], settings=args["evaluation_settings"])
+            res = container.run()
+            return {"status": "ok", "results": res}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
