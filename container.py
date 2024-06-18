@@ -25,7 +25,7 @@ from settings import (
 
 
 class Container:
-    def __init__(self, submission_url: str, validator_url: str, settings: dict[str, int], instances: dict[str, str]):
+    def __init__(self, submission_url: str, validator_url: str, instances: dict[str, str], settings: dict[str, int]):
         if any(required not in settings for required in REQUIRED_SETTINGS):
             raise ValueError(f"Settings: {settings} does not contain the required fields")
 
@@ -34,16 +34,14 @@ class Container:
 
         self.docker_client = docker.from_env()
         self._config_mounts()
-        #self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
-        #self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
-        self._setup_mount_content(DOCKER_SUBMISSION, {submission_url: "submission.zip"})
-        self._setup_mount_content(DOCKER_VALIDATOR, {validator_url: "validator.zip"})
+        self._setup_mount_content(DOCKER_SUBMISSION, {"submission.zip": submission_url})
+        self._setup_mount_content(DOCKER_VALIDATOR, {"validator.zip": validator_url})
         self._setup_mount_content(DOCKER_INSTANCES, instances)
         self.container = self.docker_client.containers.create(
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
-            cpu_period=100000, cpu_quota=settings["cpu_limit"] * 100000, mem_limit=f"{settings['memory_limit']}m",
+            cpu_period=100000, cpu_quota=settings["cpu"] * 100000, mem_limit=f"{settings['memory']}m",
         )
-        self.stop_timer = Timer(settings["timeout"], self.__timeout_stop)
+        self.stop_timer = Timer(settings["time_limit"], self.__timeout_stop)
         
     def __del__(self):
         self._tidy()
@@ -98,8 +96,8 @@ class Container:
             ),
         ]
 
-    def _setup_mount_content(self, mounted_folder: str, url_to_file: dict[str, str]):
-        for url, output_file in url_to_file.items():
+    def _setup_mount_content(self, mounted_folder: str, file_to_url: dict[str, str]):
+        for output_file, url in file_to_url.items():
             response = requests.get(url)
             
             file_path = self._folder(f"{mounted_folder}/{output_file}")
@@ -114,25 +112,32 @@ class Container:
 
     # This function needs to be changed later when we add vlads code
     def _format_results(self):
-        res_folder = self._folder(DOCKER_RESULTS)
+        result = {}
 
-        with open(path.join(res_folder, 'results.csv')) as file:
-            csv_reader = DictReader(file)
-            results = list(csv_reader)
+        for entry in os.listdir(self._folder(DOCKER_RESULTS)):
+            res_folder = path.join(self._folder(DOCKER_RESULTS), entry)
 
-        with open(path.join(res_folder, 'metrics.csv')) as file:
-            csv_reader = DictReader(file)
-            metrics = list(csv_reader)
+            with open(path.join(res_folder, 'results.csv')) as file:
+                csv_reader = DictReader(file)
+                results = list(csv_reader)
 
-        with open(path.join(res_folder, 'CPU_times.csv')) as file:
-            csv_reader = DictReader(file)
-            cpu_times = list(csv_reader)
+            with open(path.join(res_folder, 'metrics.csv')) as file:
+                csv_reader = DictReader(file)
+                metrics = list(csv_reader)
 
-        return {
-            "results": results,
-            "metrics": metrics,
-            "cpu_times": cpu_times
-        }
+            with open(path.join(res_folder, 'CPU_times.csv')) as file:
+                csv_reader = DictReader(file)
+                cpu_times = list(csv_reader)
+
+            data = {
+                "results": results,
+                "metrics": metrics,
+                "cpu_times": cpu_times
+            }
+
+            result[entry] = data
+        
+        return result
 
     def run(self):
         """
@@ -148,6 +153,7 @@ class Container:
                 self.__network_kill()
 
         self.stop_timer.cancel()
+        self.container.stop()
         return self._format_results()
     
     def __timeout_stop(self):
@@ -177,6 +183,15 @@ class Container:
 # ----------------------------------------------------------------
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", timeout = 20, cpu_limit = 1, memory_limit = 512)
+    settings = {
+        "cpu": 1,
+        "memory": 512,
+        "time_limit": 20,
+    }
+    instances = {
+        "instance1": "http://0.0.0.0:8000/instance1.txt",
+        "instance2": "http://0.0.0.0:8000/instance2.txt"
+    }
+    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings,)
     out = c.run()
     print(repr(out))

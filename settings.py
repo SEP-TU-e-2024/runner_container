@@ -37,4 +37,4 @@ DOCKER_RESULTS = "/results"
 # ----------------------------------------------------------------
 # Container settings
 # ----------------------------------------------------------------
-REQUIRED_SETTINGS = ["cpu_limit", "memory_limit", "timeout"]
+REQUIRED_SETTINGS = ["cpu", "memory", "time_limit"]

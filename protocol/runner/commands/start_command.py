@@ -14,8 +14,8 @@ class StartCommand(Command):
 
     @staticmethod
     def execute(args: dict):
-        if any(required not in args for required in ["submission", "validator", "settings", "instances"]):
-            return {"status": 400}
-        container = Container(submission_url=args["submission"], validator_url=args["validator"], settings=args["settings"], instances=args["instances"])
+        if any(required not in args for required in ["submission_url", "validator_url", "evaluation_settings", "benchmark_instances"]):
+            return {"status": "error"}
+        container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], instances=args["benchmark_instances"], settings=args["evaluation_settings"])
         res = container.run()
         return {"status": "ok", "results": res}

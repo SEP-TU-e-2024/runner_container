@@ -31,16 +31,24 @@ pip install -r validator/requirements.txt
 # signal that the main code is starting
 echo "Starting the main code"
 
-# run the profiler in the background
-/app/profiler.sh /results/metrics.csv &
-
 for file in /instances/*; do
     # copy instance into runenv
     rm -rf /app/runenv/instances/*
-    cp -r $file /app/runenv/instances
+    cp $file /app/runenv/instances/instance
 
     # create a new output folder in results
+    mkdir /results/$(basename $file)
+
+    # run the profiler in the background
+    /app/profiler.sh /results/$(basename $file)/metrics.csv &
+    PROFILER_PID=$!
 
     # run the main code in a time wrapper, so that the statistics can be tracked
-    /usr/bin/time -f "Wall time,User time,System time,Max RAM(KB)\n%e,%U,%S,%M" -o /results/CPU_times.csv python main.py
+    /usr/bin/time -f "Wall time,User time,System time,Max RAM(KB)\n%e,%U,%S,%M" -o /results/$(basename $file)/CPU_times.csv python main.py
+
+    kill $PROFILER_PID
+
+    mv /results/results.csv /results/$(basename $file)/results.csv
 done
+
+chown -R 1000:1000 /results
