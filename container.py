@@ -14,28 +14,41 @@ import requests
 from docker.types import Mount
 
 from custom_logger import main_logger
-from settings import DOCKER_IMAGE, DOCKER_RESULTS, DOCKER_SUBMISSION, DOCKER_VALIDATOR
+from settings import (
+    DOCKER_IMAGE,
+    DOCKER_INSTANCES,
+    DOCKER_RESULTS,
+    DOCKER_SUBMISSION,
+    DOCKER_VALIDATOR,
+    REQUIRED_SETTINGS,
+)
 
 
 class Container:
-    def __init__(self, submission_url: str, validator_url: str, timeout: int = 60, cpu_limit: int = 1, memory_limit: int = 512):
+    def __init__(self, submission_url: str, validator_url: str, settings: dict[str, int], instances: dict[str, str]):
+        if any(required not in settings for required in REQUIRED_SETTINGS):
+            raise ValueError(f"Settings: {settings} does not contain the required fields")
+
         self.id = f"{random.randint(0, 9999)}-{random.randint(0, 0xffffffff)}"
         self.logger = main_logger.getChild(f"container-{self.id}")
 
         self.docker_client = docker.from_env()
         self._config_mounts()
-        self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
-        self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
+        #self._setup_mount_content(submission_url, f"{DOCKER_SUBMISSION}/submission.zip")
+        #self._setup_mount_content(validator_url, f"{DOCKER_VALIDATOR}/validator.zip")
+        self._setup_mount_content(DOCKER_SUBMISSION, {submission_url: "submission.zip"})
+        self._setup_mount_content(DOCKER_VALIDATOR, {validator_url: "validator.zip"})
+        self._setup_mount_content(DOCKER_INSTANCES, instances)
         self.container = self.docker_client.containers.create(
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
-            cpu_period=100000, cpu_quota=cpu_limit * 100000, mem_limit=f"{memory_limit}m",
+            cpu_period=100000, cpu_quota=settings["cpu_limit"] * 100000, mem_limit=f"{settings['memory_limit']}m",
         )
-        self.stop_timer = Timer(timeout, self.__timeout_stop)
+        self.stop_timer = Timer(settings["timeout"], self.__timeout_stop)
         
     def __del__(self):
-        self.tidy()
+        self._tidy()
 
-    def tidy(self):
+    def _tidy(self):
         '''
         remove the directory and all subdirectories corresponding to this container (based on id)
         '''
@@ -54,7 +67,7 @@ class Container:
         """
         
         # create mounts for this directory
-        for dir in [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_RESULTS]:
+        for dir in [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_INSTANCES, DOCKER_RESULTS]:
             os.makedirs(self._folder(dir))
 
         # define the mounts for the docker container
@@ -72,6 +85,12 @@ class Container:
                 read_only=True,
             ),
             Mount(
+                target=DOCKER_INSTANCES,
+                source=self._folder(DOCKER_INSTANCES),
+                type="bind",
+                read_only=True,
+            ),
+            Mount(
                 target=DOCKER_RESULTS,
                 source=self._folder(DOCKER_RESULTS),
                 type="bind",
@@ -79,18 +98,19 @@ class Container:
             ),
         ]
 
-    def _setup_mount_content(self, url: str, output_file: str):
-        response = requests.get(url)
-        
-        file_path = self._folder(output_file)
+    def _setup_mount_content(self, mounted_folder: str, url_to_file: dict[str, str]):
+        for url, output_file in url_to_file.items():
+            response = requests.get(url)
+            
+            file_path = self._folder(f"{mounted_folder}/{output_file}")
 
-        if response.status_code == 200:
-            with open(file_path, 'wb') as file:
-                file.write(response.content)
-            self.logger.info(f"File downloaded succesfully from: {url}, filename: {file_path}")
-        else:
-            self.logger.info(f"Could not download file from: {url}, filename: {file_path}")
-            raise Exception(f"Error could not download {output_file} from {url}")
+            if response.status_code == 200:
+                with open(file_path, 'wb') as file:
+                    file.write(response.content)
+                self.logger.info(f"File downloaded succesfully from: {url}, filename: {file_path}")
+            else:
+                self.logger.info(f"Could not download file from: {url}, filename: {file_path}")
+                raise Exception(f"Error could not download {output_file} from {url}")
 
     # This function needs to be changed later when we add vlads code
     def _format_results(self):
