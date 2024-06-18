@@ -6,11 +6,12 @@ class Validator(IOModule):
 
         # Values chosen for a simple '1+1=2' test
         with open('./instances/instance', 'r') as f:
-            pass
-        self.input_sequence = ["1","1"]
-        self.obtained_answers = []
-        self.expected_answers = ["2"]
-        self.sequence_index = 0
+            a, b, c = f.readlines()
+            
+            self.input_sequence = [a, b]
+            self.obtained_answers = []
+            self.expected_answers = [c]
+            self.sequence_index = 0
 
     def _scoring_function(self, obtained_answer: str, expected_answer: str) -> int:
         """Function to evaluate the obtained answer against the expected answer."""
