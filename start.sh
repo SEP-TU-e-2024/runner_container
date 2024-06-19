@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # This script should start in /app
 
 # make a directory for the running environement
