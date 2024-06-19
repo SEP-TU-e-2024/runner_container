@@ -142,6 +142,11 @@ class Container:
                 csv_reader = DictReader(file)
                 cpu_times = list(csv_reader)
 
+            results[0]["wall_time"] = float(cpu_times[0]["Wall time"])
+            results[0]["user_time"] = float(cpu_times[0]["User time"])
+            results[0]["system_time"] = float(cpu_times[0]["System time"])
+            results[0]["max_ram_mb"] = float(cpu_times[0]["Max RAM(KB)"]) / 1000 # in MB
+
             data = {
                 "results": results,
                 "metrics": metrics,
@@ -217,10 +222,10 @@ if __name__ == "__main__":
         "time_limit": 20,
     }
     instances = {
-        "instance1": "http://0.0.0.0:8000/instance1.txt",
-        "instance2": "http://0.0.0.0:8000/instance2.txt"
+        "instance1": "http://0.0.0.0:8001/instance1.txt",
+        "instance2": "http://0.0.0.0:8001/instance2.txt"
     }
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings)
+    c = Container(submission_url="http://0.0.0.0:8001/submission.zip", validator_url="http://0.0.0.0:8001/validator.zip", instances=instances, settings=settings)
     out = c.run()
     print(repr(out))
     print(f'status: {c.status}')
