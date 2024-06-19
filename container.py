@@ -6,6 +6,7 @@ import os
 import random
 import shutil
 from csv import DictReader
+from enum import Enum
 from os import path
 from threading import Timer
 
@@ -24,7 +25,17 @@ from settings import (
 )
 
 
+class Status(Enum):
+    INITIALIZING = "initializing"
+    INITIALIZED = "initialized"
+    RUNNING = "running"
+    SUCCESS = "success"
+    TIMEOUT = "timeout"
+    ERROR = "error"
+
 class Container:
+    status: Status = Status.INITIALIZING
+
     def __init__(self, submission_url: str, validator_url: str, instances: dict[str, str], settings: dict[str, int]):
         if any(required not in settings for required in REQUIRED_SETTINGS):
             raise ValueError(f"Settings: {settings} does not contain the required fields")
@@ -42,6 +53,7 @@ class Container:
             cpu_period=100000, cpu_quota=settings["cpu"] * 100000, mem_limit=f"{settings['memory']}m",
         )
         self.stop_timer = Timer(settings["time_limit"], self.__timeout_stop)
+        self.status = Status.INITIALIZED
         
     def __del__(self):
         self._tidy()
@@ -142,25 +154,41 @@ class Container:
     def run(self):
         """
         Run the container.
+
+        Returns the results of the container execution, if successful, otherwise None.
         """
         self.logger.info("Running...")
         self.stop_timer.start()
         self.container.start()
+        self.status = Status.RUNNING
 
         for data in self.container.logs(stream=True):
             self.logger.info(f"Docker: {data.decode()}")
             if (data.decode().find("Starting the main code") != -1):
                 self.__network_kill()
 
+        # Update status
+        if self.status != Status.TIMEOUT:
+            exit_code = self.container.wait()["StatusCode"]
+            if exit_code != 0:
+                self.logger.error(f"Container exited with code {exit_code}")
+                self.status = Status.ERROR
+            else:
+                self.status = Status.SUCCESS
+
         self.stop_timer.cancel()
         self.container.stop()
-        return self._format_results()
+        if self.status == Status.SUCCESS:
+            return self._format_results()
+        
+        return None
     
     def __timeout_stop(self):
         """
         Kill the container.
         """
         self.logger.info("Timeout reached. Stopping container.")
+        self.status = Status.TIMEOUT
         self.container.stop(timeout = 0)
 
     def __network_kill(self):
@@ -174,8 +202,7 @@ class Container:
             # Check if the container is connected to the current network
             if self.container.id in container_connections:
                 network.disconnect(self.container)
-                print(f"Disconnected {self.container.name} from network {network.name}")
-        
+                self.logger.info(f"Disconnected {self.container.name} from network {network.name}")
 
 
 # ----------------------------------------------------------------
@@ -195,3 +222,4 @@ if __name__ == "__main__":
     c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings)
     out = c.run()
     print(repr(out))
+    print(f'status: {c.status}')
