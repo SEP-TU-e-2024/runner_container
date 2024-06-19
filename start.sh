@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # This script should start in /app
 
 # make a directory for the running environement
@@ -37,7 +39,7 @@ for file in /instances/*; do
     cp $file /app/runenv/instances/instance
 
     # create a new output folder in results
-    mkdir /results/$(basename $file)
+    mkdir -m 777 /results/$(basename $file)
 
     # run the profiler in the background
     /app/profiler.sh /results/$(basename $file)/metrics.csv &
@@ -50,5 +52,3 @@ for file in /instances/*; do
 
     mv /results/results.csv /results/$(basename $file)/results.csv
 done
-
-chown -R 1000:1000 /results
