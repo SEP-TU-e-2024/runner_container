@@ -56,13 +56,14 @@ class Container:
         self.status = Status.INITIALIZED
         
     def __del__(self):
-        self._tidy()
+        self.tidy()
 
-    def _tidy(self):
+    def tidy(self):
         '''
         remove the directory and all subdirectories corresponding to this container (based on id)
         '''
-        shutil.rmtree(self._folder())
+        if path.exists(self._folder()):
+            shutil.rmtree(self._folder())
 
     def _folder(self, path: str = None):
         if path:

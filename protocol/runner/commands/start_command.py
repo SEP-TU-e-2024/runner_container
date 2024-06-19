@@ -17,8 +17,11 @@ class StartCommand(Command):
 
     @staticmethod
     def execute(args: dict):
+        container = None
+        
         if any(required not in args for required in ["submission_url", "validator_url", "evaluation_settings", "benchmark_instances"]):
             return {"status": "error"}
+        
         try:
             container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], instances=args["benchmark_instances"], settings=args["evaluation_settings"])
             results = container.run()
@@ -34,3 +37,6 @@ class StartCommand(Command):
         except Exception:
             logger.error(f"Container running produced error for args {args}", exc_info=1)
             return {"status": "error", "cause": "internal_error"}
+        finally:
+            if container is not None:
+                container.tidy()
