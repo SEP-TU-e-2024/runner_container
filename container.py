@@ -52,7 +52,7 @@ class Container:
             image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
             cpu_period=100000, cpu_quota=settings["cpu"] * 100000, mem_limit=f"{settings['memory']}m",
         )
-        self.stop_timer = Timer(settings["time_limit"], self.__timeout_stop)
+        self.time_limit = settings["time_limit"]
         self.status = Status.INITIALIZED
         
     def __del__(self):
@@ -164,14 +164,21 @@ class Container:
         Returns the results of the container execution, if successful, otherwise None.
         """
         self.logger.info("Running...")
-        self.stop_timer.start()
         self.container.start()
         self.status = Status.RUNNING
 
+        timer = Timer(self.time_limit, self.__timeout_stop)
+
         for data in self.container.logs(stream=True):
             self.logger.info(f"Docker: {data.decode()}")
-            if (data.decode().find("Starting the main code") != -1):
+            if data.decode().find("Starting the main code") != -1:
                 self.__network_kill()
+            if data.decode().find("Starting benchmark instance ") != -1:
+                timer.cancel()
+                timer = Timer(self.time_limit, self.__timeout_stop)
+                timer.start()
+
+        timer.cancel()
 
         # Update status
         if self.status != Status.TIMEOUT:
@@ -182,7 +189,6 @@ class Container:
             else:
                 self.status = Status.SUCCESS
 
-        self.stop_timer.cancel()
         self.container.stop()
         if self.status == Status.SUCCESS:
             return self._format_results()
@@ -219,7 +225,7 @@ if __name__ == "__main__":
     settings = {
         "cpu": 1,
         "memory": 512,
-        "time_limit": 20,
+        "time_limit": 10,
     }
     instances = {
         "instance1": "http://0.0.0.0:8001/instance1.txt",
