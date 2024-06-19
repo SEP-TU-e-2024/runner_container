@@ -194,9 +194,9 @@ if __name__ == "__main__":
         "time_limit": 20,
     }
     instances = {
-        "instance1": "http://0.0.0.0:8000/instance1.txt",
-        "instance2": "http://0.0.0.0:8000/instance2.txt"
+        "instance1": "http://0.0.0.0:8001/instance1.txt",
+        "instance2": "http://0.0.0.0:8001/instance2.txt"
     }
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings)
+    c = Container(submission_url="http://0.0.0.0:8001/submission.zip", validator_url="http://0.0.0.0:8001/validator.zip", instances=instances, settings=settings)
     out = c.run()
     print(repr(out))
