@@ -129,6 +129,11 @@ class Container:
                 csv_reader = DictReader(file)
                 cpu_times = list(csv_reader)
 
+            results[0]["wall_time"] = float(cpu_times[0]["Wall time"])
+            results[0]["user_time"] = float(cpu_times[0]["User time"])
+            results[0]["system_time"] = float(cpu_times[0]["System time"])
+            results[0]["max_ram_mb"] = float(cpu_times[0]["Max RAM(KB)"]) / 1000 # in MB
+
             data = {
                 "results": results,
                 "metrics": metrics,
