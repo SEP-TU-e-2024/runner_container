@@ -225,13 +225,11 @@ if __name__ == "__main__":
     settings = {
         "cpu": 1,
         "memory": 512,
-        "time_limit": 10,
+        "time_limit": 1000,
     }
-    instances = {
-        "instance1": "http://0.0.0.0:8001/instance1.txt",
-        "instance2": "http://0.0.0.0:8001/instance2.txt"
-    }
-    c = Container(submission_url="http://0.0.0.0:8001/submission.zip", validator_url="http://0.0.0.0:8001/validator.zip", instances=instances, settings=settings)
+    instances = {"instance1": "http://0.0.0.0:8000/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"}
+
+    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings)
     out = c.run()
     print(repr(out))
     print(f'status: {c.status}')

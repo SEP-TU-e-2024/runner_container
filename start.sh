@@ -26,9 +26,14 @@ cd /app/runenv
 # make a directory to copy the instances to
 mkdir instances
 
-# install the requirements
-pip install -r requirements.txt
-pip install -r validator/requirements.txt
+# build both programs
+echo "Building the submission"
+chmod +x build.sh
+./build.sh
+
+echo "Building the validator"
+chmod +x ./validator/build.sh
+./validator/build.sh
 
 # signal that the main code is starting
 echo "Starting the main code"
