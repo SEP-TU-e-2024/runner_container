@@ -39,6 +39,8 @@ chmod +x ./validator/build.sh
 echo "Starting the main code"
 
 for file in /instances/*; do
+    echo "Starting benchmark instance $file"
+
     # copy instance into runenv
     rm -rf /app/runenv/instances/*
     cp $file /app/runenv/instances/instance
