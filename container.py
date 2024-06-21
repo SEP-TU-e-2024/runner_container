@@ -115,12 +115,15 @@ class Container:
 
     def tidy(self):
         '''
-        Remove the directory and all subdirectories corresponding to this container (based on `id`).
+        Remove the directory and all subdirectories corresponding to this container.
         '''
         if path.exists(self._folder()):
             shutil.rmtree(self._folder())
 
     def _folder(self, path: str = None):
+        """
+        Gets the local temporary path of a file in the container.
+        """
         parts = [os.getcwd(), "containers", self.id]
 
         if path is not None:
@@ -170,7 +173,7 @@ class Container:
     def _setup_mount_content(self, mounted_folder: str, file_to_url: dict[str, str]):
         for output_file, url in file_to_url.items():
             response = requests.get(url)
-            
+
             file_path = self._folder(f"{mounted_folder}/{output_file}")
 
             if response.status_code == 200:
@@ -221,7 +224,7 @@ class Container:
 
     def run(self):
         """
-        Run the container.
+        Run the container and wait until it stops.
 
         Returns the formatted results of the container if successful, otherwise None.
         """
@@ -229,18 +232,28 @@ class Container:
         self.container.start()
         self.status = Status.RUNNING
 
-        timer = Timer(self.time_limit, self.__timeout_stop)
+        # Initialize and start the timeout timer
+        timer = None
 
+        # Stream log output until the container stops
         for data in self.container.logs(stream=True):
             self.logger.info(f"Docker: {data.decode()}")
-            if data.decode().find("Starting the main code") != -1:
+            if b"Starting the main code" in data:
+                # Kill network after building is complete
                 self.__network_kill()
-            if data.decode().find("Starting benchmark instance ") != -1:
-                timer.cancel()
+
+            if b"Starting benchmark instance: " in data:
+                # Start the timer
                 timer = Timer(self.time_limit, self.__timeout_stop)
                 timer.start()
 
-        timer.cancel()
+            if b"Benchmark instance done: " in data:
+                # Cancel the timer
+                timer.cancel()
+        
+        # Just in case it crashed, cancel the timeout
+        if timer is not None:
+            timer.cancel()
 
         # Update status
         if self.status != Status.TIMEOUT:
@@ -267,9 +280,10 @@ class Container:
 
     def __network_kill(self):
         """
-        Remove the network connection when the main.py file is executed
+        Disconnects all network connections of the container.
         """
         for network in self.docker_client.networks.list():
+            # For each network, check if the container uses it
             network.reload()
             container_connections = network.attrs.get('Containers', {})
             
@@ -282,7 +296,7 @@ class Container:
 # ----------------------------------------------------------------
 # TESTING
 # ----------------------------------------------------------------
-# Run python3 -m http.server in local_testing
+# Run `python3 -m http.server 8001` in local_testing
 if __name__ == "__main__":
     Container.build_image()
 
@@ -292,7 +306,9 @@ if __name__ == "__main__":
         "time_limit": 1000,
     }
 
-    benchmark_instances = {"instance1": "http://0.0.0.0:8001/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"}
+    benchmark_instances = {
+        "instance1": "http://0.0.0.0:8001/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"
+    }
 
     c = Container(submission_url="http://0.0.0.0:8001/submission.zip",
                   validator_url="http://0.0.0.0:8001/validator.zip",
@@ -301,4 +317,4 @@ if __name__ == "__main__":
     output = c.run()
 
     print(repr(output))
-    print(f'status: {c.status}')
+    print(f'Container status: {c.status}')
