@@ -5,6 +5,7 @@ This module contains code used for creating and managing the containers created 
 import os
 import random
 import shutil
+import time
 from csv import DictReader
 from enum import Enum
 from logging import Logger
@@ -97,6 +98,20 @@ class Container:
 
     def __del__(self):
         self.tidy()
+
+    @staticmethod
+    def build_image():
+        """
+        Build the Docker image for the runner.
+        """
+        main_logger.info("Building image")
+        start_time = time.time()
+
+        # Build image
+        client = docker.from_env()
+        client.images.build(path=".", tag=DOCKER_IMAGE, rm=True)
+
+        main_logger.info(f"Image built, took {time.time() - start_time}s")
 
     def tidy(self):
         '''
@@ -269,6 +284,8 @@ class Container:
 # ----------------------------------------------------------------
 # Run python3 -m http.server in local_testing
 if __name__ == "__main__":
+    Container.build_image()
+
     evaluation_settings = {
         "cpu": 1,
         "memory": 512,
