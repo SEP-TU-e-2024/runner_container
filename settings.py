@@ -12,7 +12,7 @@ dotenv.load_dotenv()
 # Connection
 # ----------------------------------------------------------------
 
-JUDGE_HOST = os.getenv("JUDGE_HOST", "localhost") # TODO: change to prod version, currently IP of the jumpbox, ask Teun for how to use it
+JUDGE_HOST = os.getenv("JUDGE_HOST", "10.1.0.6") # TODO: change to prod version, currently IP of the jumpbox, ask Teun for how to use it
 """
 Host of the the judge server.
 """
