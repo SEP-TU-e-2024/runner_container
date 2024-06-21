@@ -7,3 +7,4 @@ psutil==5.9.8
 requests==2.32.2
 ruff==0.4.4
 urllib3==2.2.1
+pytest==8.2.2
