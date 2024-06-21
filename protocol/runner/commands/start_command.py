@@ -23,7 +23,7 @@ class StartCommand(Command):
             return {"status": "error"}
         
         try:
-            container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], instances=args["benchmark_instances"], settings=args["evaluation_settings"])
+            container = Container(submission_url=args["submission_url"], validator_url=args["validator_url"], benchmark_instances=args["benchmark_instances"], evaluation_settings=args["evaluation_settings"])
             results = container.run()
 
             status = container.status

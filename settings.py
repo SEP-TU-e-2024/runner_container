@@ -38,9 +38,3 @@ DOCKER_SUBMISSION = "/submission"
 DOCKER_VALIDATOR = "/validator"
 DOCKER_INSTANCES = "/instances"
 DOCKER_RESULTS = "/results"
-
-
-# ----------------------------------------------------------------
-# Container settings
-# ----------------------------------------------------------------
-REQUIRED_SETTINGS = ["cpu", "memory", "time_limit"]
