@@ -11,12 +11,14 @@ cd $1
 # Zip the submission
 echo "Creating submission.zip"
 cd submission
+rm ../submission.zip
 zip -r ../submission.zip ./*
 cd ..
 
 # Zip the validator
 echo "Creating validator.zip"
 cd validator
+rm ../validator.zip
 zip -r ../validator.zip ./*
 zip -j ../validator.zip ../../IOModule.py
 cd ..

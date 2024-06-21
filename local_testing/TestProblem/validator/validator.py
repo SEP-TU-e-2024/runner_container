@@ -40,6 +40,8 @@ class Validator(IOModule):
         """Data output function. Replaces print()."""
         obtained_answer = text
         self.obtained_answers.append(obtained_answer)
+
+        super().push_data()
         return 1 # a 'goodness' value can be returned, for dynamic problems
 
     def obtain_dataset(self) -> list: # optional

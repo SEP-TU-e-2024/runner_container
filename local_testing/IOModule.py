@@ -26,11 +26,6 @@ class IOModule:  # noqa: N999
         push_data is called by the submission code to push a new solution it has computed to the validator.
         The Validator must overwrite this function and define the appropriate datatype for such a solution.
         """
-        pass
-
-    def __del__(self):
-        """On termination of the program (when this object will be deleted) this will write all performance and score metrics to a file"""
-
         # Write score metrics to csv file
         metrics_file = open(self._OUTPUT_FILE, "w", newline="")
         scores = self._score()
