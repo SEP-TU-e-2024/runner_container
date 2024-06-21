@@ -296,7 +296,8 @@ class Container:
 # ----------------------------------------------------------------
 # TESTING
 # ----------------------------------------------------------------
-# Run `python3 -m http.server 8001` in local_testing
+#
+# Run `./run.sh TestProblem` or `./run.sh VRPTW` in local_testing
 if __name__ == "__main__":
     Container.build_image()
 
