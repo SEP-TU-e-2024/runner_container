@@ -2,7 +2,9 @@ FROM python:3
 
 # add basic dependencies
 RUN apt-get update -y
-RUN apt-get install -y sysstat time unzip
+RUN apt-get install -y sysstat time unzip build-essential
+RUN pip install -U setuptools
+RUN pip install -U wheel
 
 WORKDIR /app
 

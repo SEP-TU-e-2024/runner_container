@@ -1,12 +1,10 @@
 #!/bin/bash
 
-output_file="/results/metrics.csv"
-
 # remove the file if it exists and create it
-touch $output_file
+touch $1
 
 # print header to the CSV file
-echo "CPU Usage percent, RAM Usage MB" > $output_file
+echo "CPU Usage percent, RAM Usage MB" > $1
 
 while true
 do
@@ -18,6 +16,6 @@ do
   ram_usage=$(free -m | awk 'NR==2{print $3}') # this is the absolute value
   
   # save to CSV file
-  echo "$cpu_usage, $ram_usage" >> $output_file
+  echo "$cpu_usage, $ram_usage" >> $1
 
 done
