@@ -86,7 +86,6 @@ class Container:
             image=DOCKER_IMAGE,
             mounts=self.mounts,
             detach=True,
-            auto_remove=True,
             # Add evaluation settings
             cpu_period=100000,
             cpu_quota=evaluation_settings["cpu"] * 100000,
@@ -265,6 +264,7 @@ class Container:
                 self.status = Status.SUCCESS
 
         self.container.stop()
+        self.container.remove()
         if self.status == Status.SUCCESS:
             return self._format_results()
         
@@ -306,8 +306,13 @@ if __name__ == "__main__":
         "time_limit": 1000,
     }
 
+    # benchmark_instances = {
+    #     "instance1": "http://0.0.0.0:8001/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"
+    # }
+
     benchmark_instances = {
-        "instance1": "http://0.0.0.0:8001/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"
+        "instance1": "http://0.0.0.0:8001/instance1.txt",
+        "instance2": "http://0.0.0.0:8001/instance2.txt"
     }
 
     c = Container(submission_url="http://0.0.0.0:8001/submission.zip",
