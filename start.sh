@@ -39,8 +39,6 @@ chmod +x ./validator/build.sh
 echo "Starting the main code"
 
 for file in /instances/*; do
-    echo "Starting benchmark instance $file"
-
     # copy instance into runenv
     rm -rf /app/runenv/instances/*
     cp $file /app/runenv/instances/instance
@@ -52,8 +50,12 @@ for file in /instances/*; do
     /app/profiler.sh /results/$(basename $file)/metrics.csv &
     PROFILER_PID=$!
 
+    echo "Starting benchmark instance: $file"
+
     # run the main code in a time wrapper, so that the statistics can be tracked
     /usr/bin/time -f "Wall time,User time,System time,Max RAM(KB)\n%e,%U,%S,%M" -o /results/$(basename $file)/CPU_times.csv python main.py
+
+    echo "Benchmark instance done: $file"
 
     kill $PROFILER_PID
 

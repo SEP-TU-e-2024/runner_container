@@ -5,8 +5,10 @@ This module contains code used for creating and managing the containers created 
 import os
 import random
 import shutil
+import time
 from csv import DictReader
 from enum import Enum
+from logging import Logger
 from os import path
 from threading import Timer
 
@@ -21,67 +23,125 @@ from settings import (
     DOCKER_RESULTS,
     DOCKER_SUBMISSION,
     DOCKER_VALIDATOR,
-    REQUIRED_SETTINGS,
 )
 
 
 class Status(Enum):
+    """
+    Enum for the status of the container.
+    """
+
     INITIALIZING = "initializing"
+    """
+    The container is initializing.
+    """
+
     INITIALIZED = "initialized"
+    """
+    The container is initialized.
+    """
+
     RUNNING = "running"
+    """
+    The container is running.
+    """
+
     SUCCESS = "success"
+    """
+    The container has finished successfully.
+    """
+
     TIMEOUT = "timeout"
+    """
+    An evaluation in the container timed out.
+    """
+
     ERROR = "error"
+    """
+    An evaluation in the container errorred.
+    """
 
 class Container:
+    id: str
+    logger: Logger
+    docker_client: docker.DockerClient
+    container: docker.models.containers.Container
+    mounts: list[Mount]
+    time_limit: int
     status: Status = Status.INITIALIZING
 
-    def __init__(self, submission_url: str, validator_url: str, instances: dict[str, str], settings: dict[str, int]):
-        if any(required not in settings for required in REQUIRED_SETTINGS):
-            raise ValueError(f"Settings: {settings} does not contain the required fields")
-
-        self.id = f"{random.randint(0, 9999)}-{random.randint(0, 0xffffffff)}"
+    def __init__(self, submission_url: str, validator_url: str, benchmark_instances: dict[str, str], evaluation_settings: dict[str, int]):
+        # Generate a random ID
+        self.id = f"{random.randint(0, 0xffffffff):08x}"
         self.logger = main_logger.getChild(f"container-{self.id}")
 
+        # Set up the Docker container
         self.docker_client = docker.from_env()
         self._config_mounts()
         self._setup_mount_content(DOCKER_SUBMISSION, {"submission.zip": submission_url})
         self._setup_mount_content(DOCKER_VALIDATOR, {"validator.zip": validator_url})
-        self._setup_mount_content(DOCKER_INSTANCES, instances)
+        self._setup_mount_content(DOCKER_INSTANCES, benchmark_instances)
         self.container = self.docker_client.containers.create(
-            image=DOCKER_IMAGE, mounts=self.mounts, detach=True,
-            cpu_period=100000, cpu_quota=settings["cpu"] * 100000, mem_limit=f"{settings['memory']}m",
+            name=f"BenchLab_Runner_{self.id}",
+            image=DOCKER_IMAGE,
+            mounts=self.mounts,
+            detach=True,
+            # Add evaluation settings
+            cpu_period=100000,
+            cpu_quota=evaluation_settings["cpu"] * 100000,
+            mem_limit=f"{evaluation_settings['memory']}m",
         )
-        self.time_limit = settings["time_limit"]
+
+        self.time_limit = evaluation_settings["time_limit"]
         self.status = Status.INITIALIZED
-        
+
     def __del__(self):
         self.tidy()
 
+    @staticmethod
+    def build_image():
+        """
+        Build the Docker image for the runner.
+        """
+        main_logger.info("Building image")
+        start_time = time.time()
+
+        # Build image
+        client = docker.from_env()
+        client.images.build(path=".", tag=DOCKER_IMAGE, rm=True)
+
+        main_logger.info(f"Image built, took {time.time() - start_time}s")
+
     def tidy(self):
         '''
-        remove the directory and all subdirectories corresponding to this container (based on id)
+        Remove the directory and all subdirectories corresponding to this container.
         '''
         if path.exists(self._folder()):
             shutil.rmtree(self._folder())
 
     def _folder(self, path: str = None):
-        if path:
+        """
+        Gets the local temporary path of a file in the container.
+        """
+        parts = [os.getcwd(), "containers", self.id]
+
+        if path is not None:
             if path[0] == "/":
                 path = path[1:]
-            return os.path.join(os.getcwd(), self.id, path)
-        return os.path.join(os.getcwd(), self.id)
+            parts.append(path)
+
+        return os.path.join(*parts)
 
     def _config_mounts(self):
         """
-        Configures the mounts for the container.
+        Generate the mounts for the container, stored in `mounts` field.
         """
-        
-        # create mounts for this directory
+
+        # Create mounts for this directory
         for dir in [DOCKER_SUBMISSION, DOCKER_VALIDATOR, DOCKER_INSTANCES, DOCKER_RESULTS]:
             os.makedirs(self._folder(dir))
 
-        # define the mounts for the docker container
+        # Define the mounts for the docker container
         self.mounts = [
             Mount(
                 target=DOCKER_SUBMISSION,
@@ -112,7 +172,7 @@ class Container:
     def _setup_mount_content(self, mounted_folder: str, file_to_url: dict[str, str]):
         for output_file, url in file_to_url.items():
             response = requests.get(url)
-            
+
             file_path = self._folder(f"{mounted_folder}/{output_file}")
 
             if response.status_code == 200:
@@ -123,25 +183,29 @@ class Container:
                 self.logger.info(f"Could not download file from: {url}, filename: {file_path}")
                 raise Exception(f"Error could not download {output_file} from {url}")
 
-    # This function needs to be changed later when we add vlads code
     def _format_results(self):
+        """
+        Formats the results from the evaluation in simple dictionaries.
+        """
         result = {}
 
+        # Iterate over all benchmark instances
         for entry in os.listdir(self._folder(DOCKER_RESULTS)):
-            res_folder = path.join(self._folder(DOCKER_RESULTS), entry)
+            results_folder = path.join(self._folder(DOCKER_RESULTS), entry)
 
-            with open(path.join(res_folder, 'results.csv')) as file:
+            with open(path.join(results_folder, 'results.csv')) as file:
                 csv_reader = DictReader(file)
                 results = list(csv_reader)
 
-            with open(path.join(res_folder, 'metrics.csv')) as file:
+            with open(path.join(results_folder, 'metrics.csv')) as file:
                 csv_reader = DictReader(file)
                 metrics = list(csv_reader)
 
-            with open(path.join(res_folder, 'CPU_times.csv')) as file:
+            with open(path.join(results_folder, 'CPU_times.csv')) as file:
                 csv_reader = DictReader(file)
                 cpu_times = list(csv_reader)
 
+            # Add some hardware metrics to the results
             results[0]["wall_time"] = float(cpu_times[0]["Wall time"])
             results[0]["user_time"] = float(cpu_times[0]["User time"])
             results[0]["system_time"] = float(cpu_times[0]["System time"])
@@ -159,26 +223,36 @@ class Container:
 
     def run(self):
         """
-        Run the container.
+        Run the container and wait until it stops.
 
-        Returns the results of the container execution, if successful, otherwise None.
+        Returns the formatted results of the container if successful, otherwise None.
         """
         self.logger.info("Running...")
         self.container.start()
         self.status = Status.RUNNING
 
-        timer = Timer(self.time_limit, self.__timeout_stop)
+        # Initialize and start the timeout timer
+        timer = None
 
+        # Stream log output until the container stops
         for data in self.container.logs(stream=True):
             self.logger.info(f"Docker: {data.decode()}")
-            if data.decode().find("Starting the main code") != -1:
+            if b"Starting the main code" in data:
+                # Kill network after building is complete
                 self.__network_kill()
-            if data.decode().find("Starting benchmark instance ") != -1:
-                timer.cancel()
+
+            if b"Starting benchmark instance: " in data:
+                # Start the timer
                 timer = Timer(self.time_limit, self.__timeout_stop)
                 timer.start()
 
-        timer.cancel()
+            if b"Benchmark instance done: " in data:
+                # Cancel the timer
+                timer.cancel()
+        
+        # Just in case it crashed, cancel the timeout
+        if timer is not None:
+            timer.cancel()
 
         # Update status
         if self.status != Status.TIMEOUT:
@@ -190,6 +264,7 @@ class Container:
                 self.status = Status.SUCCESS
 
         self.container.stop()
+        self.container.remove()
         if self.status == Status.SUCCESS:
             return self._format_results()
         
@@ -197,17 +272,18 @@ class Container:
     
     def __timeout_stop(self):
         """
-        Kill the container.
+        Kill the container because of a timeout.
         """
-        self.logger.info("Timeout reached. Stopping container.")
+        self.logger.info("Timeout reached, stopping container.")
         self.status = Status.TIMEOUT
         self.container.stop(timeout = 0)
 
     def __network_kill(self):
         """
-        Remove the network connection when the main.py file is executed
+        Disconnects all network connections of the container.
         """
         for network in self.docker_client.networks.list():
+            # For each network, check if the container uses it
             network.reload()
             container_connections = network.attrs.get('Containers', {})
             
@@ -220,16 +296,31 @@ class Container:
 # ----------------------------------------------------------------
 # TESTING
 # ----------------------------------------------------------------
-# Run python3 -m http.server in local_testing
+#
+# Run `./run.sh TestProblem` or `./run.sh VRPTW` in local_testing
 if __name__ == "__main__":
-    settings = {
+    Container.build_image()
+
+    evaluation_settings = {
         "cpu": 1,
         "memory": 512,
         "time_limit": 1000,
     }
-    instances = {"instance1": "http://0.0.0.0:8000/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"}
 
-    c = Container(submission_url="http://0.0.0.0:8000/submission.zip", validator_url="http://0.0.0.0:8000/validator.zip", instances=instances, settings=settings)
-    out = c.run()
-    print(repr(out))
-    print(f'status: {c.status}')
+    benchmark_instances = {
+        "instance1": "http://0.0.0.0:8001/ORTEC-VRPTW-ASYM-0bdff870-d1-n458-k35.txt"
+    }
+
+    # benchmark_instances = {
+    #     "instance1": "http://0.0.0.0:8001/instance1.txt",
+    #     "instance2": "http://0.0.0.0:8001/instance2.txt"
+    # }
+
+    c = Container(submission_url="http://0.0.0.0:8001/submission.zip",
+                  validator_url="http://0.0.0.0:8001/validator.zip",
+                  benchmark_instances=benchmark_instances,
+                  evaluation_settings=evaluation_settings)
+    output = c.run()
+
+    print(repr(output))
+    print(f'Container status: {c.status}')

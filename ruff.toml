@@ -1,6 +1,6 @@
 preview = true
 
-extend-exclude = [".github"]
+extend-exclude = [".github", "local_testing"]
 
 line-length = 100
 indent-width = 4

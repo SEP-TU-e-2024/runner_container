@@ -1,0 +1,3 @@
+CHOOSEN_STRATEGY = 'greedy'
+MODEL_PATH = None
+VERBOSE = True
