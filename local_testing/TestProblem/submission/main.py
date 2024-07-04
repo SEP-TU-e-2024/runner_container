@@ -4,8 +4,8 @@ from validator.validator import Validator
 
 io = Validator()
 
-a = io.obtain_data()
-b = io.obtain_data()
+a = io.obtain_data("Enter a number: ")
+b = io.obtain_data("Enter another number: ")
 sum = int(a) + int(b)
 
 io.push_data(str(sum))
