@@ -3,12 +3,8 @@ The main logger to be used by the program.
 """
 
 import logging
-import os
 
 main_logger: logging.Logger = logging.getLogger("runner")
-
-if not os.path.exists("logs"):
-    os.makedirs("logs")
 
 # Allow all log levels
 main_logger.setLevel(logging.DEBUG)
